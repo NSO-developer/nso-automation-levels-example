@@ -1,0 +1,68 @@
+module video-edge-streamer {
+  yang-version 1.1;
+  namespace "http://tail-f.com/ns/cleu24/tecops-2665/video-edge-streamer";
+  prefix "tc-streamer";
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+
+  /* GROUPINGS */
+  grouping ingress {
+    leaf ingress-speed {
+      config false;
+      type uint64 {
+        range 0..max;
+      }
+      units "KiB/s";
+      description
+        "Ingress speed in KiB/s.";
+    }
+    leaf ingress-traffic {
+      config false;
+      type uint64 {
+        range 0..max;
+      }
+      units "KiB";
+      description
+        "Ingress traffic in KiB.";
+    }
+    leaf jitter {
+      config false;
+      type decimal64 {
+        fraction-digits 3;
+      }
+      units "seconds";
+      description
+        "Packet Delay Variation, i.e. packet-jitter, in seconds.";
+      reference
+        "RFC 3393: IP Packet Delay Variation Metric for IP Performance
+                   Metrics (IPPM)";
+    }
+  }
+
+
+  /* DATA NODES */
+  container video-edge-streamer {
+
+    leaf video-origin-server {
+        type inet:host;
+    }
+
+    leaf subscriber-server {
+        type inet:host;
+    }
+
+    list content {
+      key content-id;
+      leaf content-id {
+        type string;
+      }
+
+      leaf buffer-fill { type string; }
+
+      uses ingress;
+    }
+  }
+}
