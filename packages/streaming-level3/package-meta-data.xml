@@ -1,0 +1,6 @@
+<ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
+  <name>streaming</name>
+  <package-version>1.0</package-version>
+  <description>TECOPS-2665</description>
+  <ncs-min-version>6.1</ncs-min-version>
+</ncs-package>
