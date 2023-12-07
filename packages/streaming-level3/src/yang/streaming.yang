@@ -1,0 +1,148 @@
+module streaming {
+  namespace "http://com/example/basic-streaming/streaming";
+  prefix streaming;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  description
+     "";
+
+  revision 2023-11-21 {
+    description
+      "Initial revision.";
+  }
+
+  list  dc{
+    key name;  
+    leaf name {
+      type string;
+    }
+
+    leaf fw {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+
+    leaf media-origin {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+
+    leaf skylight {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+
+    leaf is-active {
+      type boolean;
+      default false;
+    }
+  }
+
+  list edge {
+    key name;
+
+    uses ncs:nano-plan-data;
+    uses ncs:service-data;
+    ncs:servicepoint "edge-servicepoint";
+
+    leaf name  {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+    leaf dc {
+      type leafref {
+        path "/streaming:dc/streaming:name";
+      }
+    } 
+  }
+  
+  identity dc {
+    base ncs:plan-component-type;
+  }
+
+  identity skylight-configured {
+    base ncs:plan-state;  
+    description "connect Skylight to NSO";
+  }
+  identity media-origin-monitored {
+    base ncs:plan-state;  
+    description "Add media origin to Skylight";
+  }
+  identity fw-configured {
+    base ncs:plan-state;  
+    description "Add media origin to FW, and allow traffic in to the DC (only if DC is active)";
+  }
+  identity edge {
+    base ncs:plan-component-type;
+  }
+  identity connected-to-skylight {
+    base ncs:plan-state;  
+    description "Add edge to Skylight";
+  }
+  identity connected-to-dc {
+    base ncs:plan-state;
+    description "Connect edge to DC (via FW)";
+  }
+
+  ncs:plan-outline edge-plan {
+    description "";
+    ncs:self-as-service-status;
+
+    ncs:component-type "dc" {
+      ncs:state "ncs:init";
+      ncs:state "streaming:skylight-configured";
+      ncs:state "streaming:media-origin-monitored";
+      ncs:state "streaming:fw-configured" {
+        ncs:create {
+          ncs:pre-condition {
+            ncs:monitor
+              "/streaming:dc[name = $SERVICE/dc]" {
+              ncs:trigger-expr "is-active = 'true'";
+            }
+          }
+        }
+      }
+      ncs:state "ncs:ready";      
+    }
+
+    ncs:component-type "edge" {
+      ncs:state "ncs:init";
+      ncs:state "streaming:connected-to-dc" {
+        ncs:create {
+          ncs:pre-condition {
+            ncs:monitor
+              "$SERVICE/plan/component[type='streaming:dc']/state[name='ncs:ready']" {
+              ncs:trigger-expr "status = 'reached'";
+            }
+          }
+        }
+      }
+      ncs:state "streaming:connected-to-skylight";
+      ncs:state "ncs:ready";      
+    }
+  }
+
+  ncs:service-behavior-tree edge-servicepoint {
+    description "";
+    ncs:plan-outline-ref "streaming:edge-plan";
+
+    ncs:selector {
+      ncs:create-component "'dc'" {
+        ncs:component-type-ref "streaming:dc";
+      }
+      ncs:create-component "'edge'" {
+        ncs:component-type-ref "streaming:edge";
+      }
+    }
+  }
+}

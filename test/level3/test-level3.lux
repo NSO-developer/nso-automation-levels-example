@@ -1,0 +1,118 @@
+[doc Test service (level 3)]
+
+[config require=MAKE]
+
+[global fail_pattern=[Ee][Rr][Rr][Oo][Rr]]
+
+[shell ncs]
+    [timeout 30]
+    !${MAKE} start
+    ?SH-PROMPT
+    !echo ==$?==
+    ?==0==
+    ?SH-PROMPT
+
+[shell ncs-cli]
+    -$fail_pattern
+    !${MAKE} cli
+    ?admin connected
+    ?admin@.*>
+
+    !set paginate false
+    ??[ok]
+    ?admin@.*>
+
+    !configure
+    ?admin@.*%
+
+    !request devices sync-from
+    ??[ok]
+    ?admin@.*%
+
+    !set dc dc0 fw fw0 media-origin mediaorigin0 skylight skylight0
+    ??[ok]
+    !set dc dc1 fw fw1 media-origin mediaorigin1 skylight skylight1
+    ??[ok]
+    !commit
+    ??Commit complete
+
+    !set edge edge0 dc dc0
+    ??[ok]
+    !commit
+    ??Commit complete
+
+    !run show edge plan | notab
+"""?
+ plan component dc dc
+  state init
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state skylight-configured
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state media-origin-monitored
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state fw-configured
+   status not-reached
+  state ready
+   status not-reached
+  back-track false
+ plan component edge edge
+  state init
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state connected-to-dc
+   status not-reached
+  state connected-to-skylight
+   status not-reached
+  state ready
+   status not-reached
+  back-track false
+"""
+    ??[ok]
+    !set dc dc0 is-active true
+    ??[ok]
+    !commit
+    ??Commit complete
+
+    ??Commit performed by admin
+    !run show edge plan | notab
+"""?
+ plan component dc dc
+  state init
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state skylight-configured
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state media-origin-monitored
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state fw-configured
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state ready
+   status reached
+   when   .*T.*:.*:[0-9]*
+  back-track false
+ plan component edge edge
+  state init
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state connected-to-dc
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state connected-to-skylight
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state ready
+   status reached
+   when   .*T.*:.*:[0-9]*
+  back-track false
+"""
+
+[cleanup]
+    !${MAKE} stop
+    !echo ==$$?==
+    ?==[0-9]+==
