@@ -1,0 +1,768 @@
+// Contents of "accedian-gateway-orchestrator"
+module accedian-gateway-orchestrator {
+    yang-version 1.1;
+    namespace "urn:accedian:params:xml:ns:yang:accedian-gateway-orchestrator";
+    prefix "accedian-gateway-orchestrator";
+
+    import ietf-inet-types {
+        prefix inet;
+        revision-date 2013-07-15;
+    }
+    import accedian-throughput {
+        prefix accedian-throughput;
+        revision-date 2022-02-15;
+    }
+    import accedian-twamp {
+        prefix accedian-twamp;
+    }
+
+    import accedian-common {
+        prefix common;
+        revision-date 2022-02-15;
+    }
+    
+    include "accedian-agent-configuration";
+//    include "accedian-session";
+    include "accedian-sensor-control-reflector";
+    organization
+      "Accedian";
+
+    contact
+      "Web URL: https://accedian.com/
+       E-mail: info@accedian.com
+          Phone:   1.514.331.6181 or +1.866.685.8181";
+
+    description
+      "This yang module defines Accedian of skylight components configuration";
+
+    revision 2022-02-15 {
+        description
+          "Initial Revision";
+        reference
+          "accedian-gateway-orchestrator";
+    }
+
+    typedef agent-state {
+
+        type enumeration {
+            enum "configured" {
+
+                description
+                  "agent is configured";
+            }
+            enum "unconfigured" {
+
+                description
+                  "agent is un-configured";
+            }
+        }
+        description
+          "Defines Agent state";
+    }
+
+    typedef agent-status {
+        type enumeration {
+            enum "connected" {
+
+                description
+                  "agent is connected";
+            }
+            enum "disconnected" {
+
+                description
+                  "agent is not connected";
+            }
+        }
+        description
+          "Agent state Type";
+    }
+    typedef agent-type {
+        type enumeration {
+            enum "actuate" {
+
+                description
+                  "Indicate an actuate agent";
+            }
+            enum "throughput" {
+
+                description
+                  "Indicate an throughput agent";
+            }
+        }
+        description
+          "Agent Type";
+    }
+
+    typedef endpoint-state {
+        type enumeration {
+            enum "resolved" {
+
+                description
+                  "endpoint is resolved";
+            }
+            enum "terminated" {
+
+                description
+                  "agent is terminated";
+            }
+        }
+        description
+          "Endpoint state Type";
+    }
+
+    typedef endpoint-type {
+        type enumeration {
+            enum "reflector" {
+
+                description
+                  "Indicate an reflector endpoint";
+            }
+            enum "supervision" {
+
+                description
+                  "Indicate an reflector supervision";
+            }
+            enum "all" {
+
+                description
+                  "Indicate can support both";
+            }
+        }
+        description
+          "Agent Type";
+    }
+
+    typedef endpoint-interface-type {
+        type enumeration {
+            enum "Ether" {
+
+                description
+                  "Indicate Ethernet Interface endpoint";
+            }
+            enum "VCE" {
+
+                description
+                  "Indicate VCE  interface endpoint";
+            }
+            enum "VLAN" {
+
+                description
+                  "Indicate VLAN  interface endpoint";
+            }
+        }
+        description
+          "Interface Type";
+    }
+    typedef supportedActionByEndpoint {
+
+        type enumeration{
+            enum start {
+                description
+                  "start endpoint";
+            }
+
+          enum acquire {
+                description
+                  "start endpoint";
+            }
+
+            enum resolve {
+                description
+                  "resolve endpoint";
+            }
+
+            enum terminate {
+                description
+                  "terminate endpoint";
+            }
+        }
+        description
+          "supported action by endpoint";
+    }
+    
+
+
+    container accedian-components {
+        description
+          "Top level container to represent Accedian sensor components";
+
+        container sensor-agent {
+            description
+              "This is the root level container for Skylight sensor agent, agent configuration and agent session";
+
+            container agents {
+                description
+                  "Root Level data container for skylight agents";
+
+                list agent {
+
+                    key agentId;
+//                    unique agentName;
+                    description
+                      "List of Agents configured in system";
+                    leaf agentId {
+                        type string;
+                        description
+                          "Indicate the unique agent id for the agent";
+                    }
+                    leaf agentName {
+                        type string;
+                        mandatory true;
+                        description
+                          "Indicate the unique agent’s name for the agent";
+                    }
+                    leaf state {
+                        type agent-state;
+                        config false;
+                        description
+                          "Indicate the state of the agent";
+                    }
+                    leaf status {
+                        type agent-status;
+                        config false;
+                        description
+                          "Indicate the status of the agent";
+                    }
+                    leaf agentType {
+                        type agent-type;
+                        description
+                          "Indicate the type of the agent";
+                    }
+
+                    uses agentconfiguration-group;
+                }
+                action operateAgent {
+                    description
+                      "operation to be performed on Agent";
+
+                    input {
+                        leaf actionName {
+
+                            type common:supportedActionbySession;
+                            default run;
+                            description
+                              "Name of the action to be invoked";
+                        }
+
+                        leaf agentId {
+                            type leafref {
+                                path "/accedian-components/sensor-agent/agents/agent/agentId";
+                            }
+                            description
+                              " Agent Id to locate the session";
+                        }
+                        list sessions {
+                            key sessionId;
+                            leaf sessionId {
+                                type leafref {
+                                    path "/sessions/session/sessionIdentifier";
+                                }
+                                description
+                                  " Session Id to locate the session";
+                            }
+                            // override container with all parms -- sessionType Enum to be mapped , throughput to take from accedian throughput
+                            container overrides {
+                                description
+                                  "overrides agent session at runtime ";
+                                leaf ifStateful {
+                                    type boolean;
+                                    description
+                                      "Indicates if the session mode is stateful or stateless";
+                                }
+
+                                leaf sessionType {
+                                    type common:session-type;
+                                    mandatory true;
+                                    description
+                                      "Session Type to execute the command";
+                                }
+                                container throughput {
+                                    description
+                                      "Top level container for Throughput configuration";
+
+                                    uses accedian-throughput:throughput-group;
+                                }
+                            }
+                        }
+                    }
+                    output {
+                      leaf result {
+                    	type string;  
+                      }
+                    }
+                }
+            }
+        }
+
+        container sensor-control {
+
+            description
+              "This is the root level container for Skylight sensor control and control session";
+
+            container endpoints {
+                description
+                  "Root Level data container for skylight control endpoints";
+                list endpoint {
+                    key "name type";
+                    description
+                      "Represents an endpint where service terminates";
+                    uses endPointsCommonAttribute-group;
+
+                    container interfaces {
+                        config false;
+                        description
+                          " Intefaces for the endpoints";
+                        list interface {
+                            key name;
+                            leaf name {
+                                type string;
+                                description
+                                  "name of Interface";
+                            }
+                            leaf type {
+                                type endpoint-interface-type;
+                                description
+                                  "type of Interface";
+                            }
+
+                            leaf mac {
+                                type common:mac;
+                                description
+                                  "mac of the endpoint";
+                            }
+                            list ipaddress {
+                                key ip;
+                                description
+                                  " list of Ip addresses";
+
+                                leaf ip {
+                                    type string;
+                                    description
+                                      "interface IP Address";
+                                }
+                            }
+                        }
+                    }
+
+                    container reflector {
+
+                        when "/accedian-components/sensor-control/endpoints/endpoint[name=current()/../name]/type='reflector'";
+                        uses endpoint-reflector;
+                        description
+                          "reflector configuration parameters on endpoint";
+                    }
+                }
+
+                action operateControl {
+                    description
+                      "operations to be performed on endpoint";
+
+                    input {
+                        leaf actionName {
+                            type supportedActionByEndpoint;
+                            description
+                              "Name of the action to be triggered";
+                        }
+                        leaf name {
+                            type leafref {
+                                path "/accedian-components/sensor-control/endpoints/endpoint/name";
+                            }
+                            description
+                              " endpoint connected with the session";
+                        }
+                    }
+                    
+                    output {
+                      leaf result {
+                        type string;  
+                      }
+                    }
+                }
+            }
+        }
+    }
+
+    grouping endPointsCommonAttribute-group {
+        description
+          "endpoint common attribute group";
+
+        leaf name {
+            type string;
+            mandatory true;
+            description
+              "Name of the endpoint";
+        }
+
+        leaf ip-address {
+            type inet:ip-address;
+            mandatory true;
+            description
+              "endpoint IP address";
+        }
+
+        leaf description {
+            type string;
+            description
+              "Description of endpoint";
+        }
+        leaf type {
+            type endpoint-type;
+            description
+              "type of endpoint";
+        }
+
+        leaf mac {
+            type common:mac;
+            description
+              "mac address of the endpoint";
+        }
+
+        leaf product {
+            type common:endpoint-product-type;
+            mandatory true;
+            description
+              "Product type of the endpoint";
+        }
+
+        leaf serial-no {
+            type string;
+            description
+              "serial number of the endppoint";
+        }
+
+        leaf state {
+            type common:endpoint-State;
+            config false;
+            description
+              "state of the endpoint";
+        }
+        leaf errorInfo {
+            type string;
+            config false;
+            description
+              "Information about what caused a error situation, if available.";
+        }
+    }
+
+    // WORKAROUND: accedian-session.yang submodule manual include due to missing diff-deps
+    typedef supportedActionBycontrolSession {
+        type enumeration{
+            enum "start" {
+                description
+                  "Start session";
+            }
+            enum "stop" {
+                description
+                  "stop session";
+            }
+        }
+    }
+    typedef reflector-mode {
+
+        type enumeration {
+            enum "stateful" {
+                description
+                  "twamp-stateful Session";
+            }
+            enum "stateless" {
+                description
+                  "twamp-stateless Session";
+            }
+        }
+        description
+          "Indicates reflector mode configuration";
+    }
+
+    grouping session-statistics {
+        description
+          " Group conatins the session statistics information";
+        leaf statusMessage {
+            type string;
+            config false;
+            description
+              "Descriptive message of the session-status";
+        }
+        leaf state {
+            type common:session-State;
+            config false;
+            description
+              "Indicates state of session";
+        }
+        leaf captureTime {
+            type string;
+            config false;
+            description
+              "Capture time for session execution";
+        }
+    }
+
+    grouping interface-attributes-group {
+        leaf endpointName {
+
+            type leafref{
+                path "/accedian-gateway-orchestrator:accedian-components/sensor-control/endpoints/endpoint/name";
+            }
+            description
+              "endpoint name connected with the session";
+        }
+        leaf interfaceName {
+//            config false;
+//            type leafref{
+//                path "/gateway-orchestrator:accedian-components/sensor-control/endpoints/endpoint[name=current()/../endpointName]/interfaces/interface/name";
+//            }
+        	type string;
+            description
+              "endpoint interface connected with the session";
+        }
+
+        leaf port {
+            type inet:port-number;
+            description
+              "interface port";
+        }
+
+        leaf ip-address {
+//            config false;
+//            type leafref{
+//                path "/gateway-orchestrator:accedian-components/sensor-control/endpoints/endpoint[name=current()/../endpointName]/interfaces/interface[name=current()/../interfaceName]/ipaddress/ip";
+//            }
+        	type string;
+            description
+              "ip address";
+        }
+    }
+
+    grouping session-list-group {
+        description
+          "grouping list of sessions ";
+
+        list session {
+
+            key "sessionIdentifier orchestratorType";
+            description
+              "a session to establish connectivity";
+            leaf sessionIdentifier {
+                type string;
+                description
+                  "Unique Id to identify a session ";
+            }
+            leaf orchestratorType {
+                type common:orchestratorType;
+                description
+                  "Orchestrator Type to identify if the session is for Agengt or control orchestrator";
+            }
+
+            leaf sessiontype {
+                type common:session-type;
+                description
+                  "Indicates Session Type";
+            }
+            leaf ifStateful {
+                type boolean;
+                description
+                  "Indicates if the session mode is stateful or stateless";
+            }
+
+            container agent {
+                when "../orchestratorType = 'agent'";
+
+                leaf agentId {
+                    type leafref {
+                        path "/accedian-gateway-orchestrator:accedian-components/sensor-agent/agents/agent/agentId";
+                    }
+                    description
+                      "agent Id";
+                }
+                leaf agentSessionName {
+                    type string;
+                    description
+                      "Session Name configured on agent";
+                }
+                leaf enable {
+                    type boolean;
+                    default true;
+                    description
+                      "whether the session is Enable or not";
+                }
+                leaf period {
+                    type string;
+                    default "continuous";
+                    description
+                      "Period of the session";
+                }
+                description
+                  "Agent linked with the session";
+            }
+
+            container control {
+                when "../orchestratorType = 'control'";
+                leaf description {
+                    type string;
+                    description
+                      " description of the control session";
+                }
+                leaf addressFamily {
+                    type common:addressFamily;
+                    default ipv4;
+                    description
+                      "Address family used in the session";
+                }
+                leaf gateWayAddress {
+                    type inet:ip-address;
+                    description
+                      "Indicates the gateway address of the session";
+                }
+                leaf dscp {
+                    type inet:dscp;
+                    default "0";
+                    description
+                      "dscp for the control session";
+                }
+
+                container source {
+                    uses interface-attributes-group;
+                    description
+                      "specifies source endpoint properties";
+                }
+
+                container destination {
+                    uses interface-attributes-group;
+                    description
+                      "specifies destination endpoint properties";
+                }
+
+                container connectionParameters {
+                    description
+                      "specifies connection related parameters";
+                    leaf interval {
+                        type uint32{
+                            range 5..900;
+                        }
+                        default 30;
+                        description
+                          "interval period";
+                    }
+
+                    leaf tos {
+                        type uint8{
+                            range 0..255;
+                        }
+                        default 0;
+                        description
+                          "type of Service";
+                    }
+                    leaf ttl {
+                        type uint8{
+                            range 1..255;
+                        }
+                        default 255;
+                        description
+                          "time to live";
+                    }
+
+                    leaf vprio {
+                        type uint8{
+                            range 0..7;
+                        }
+                        default 0;
+                        description
+                          "time to live";
+                    }
+                }
+
+                leaf-list labels {
+                    type string;
+                    description
+                      "List of session labels";
+                }
+                container stream {
+
+                    description
+                      "Represents the Session Stream configuration";
+
+                    leaf payloadSize {
+                        type uint32;
+
+//                        mandatory true;
+                        description
+                          "Payload size of the session Stream";
+                    }
+                    leaf pps {
+
+                        type decimal64 {
+                            range 0.1..200;
+                            fraction-digits 2;
+                        }
+//                        mandatory true;
+                        description
+                          "indicates Packet per second";
+                    }
+                    leaf type {
+                        type common:session-stream-type;
+                        description
+                          "Indicates the media type of the session stream";
+                    }
+                }
+
+                action operateControlSession {
+                    description
+                      "operations to be performed on control session";
+
+                    input {
+                        leaf actionName {
+                            type supportedActionBycontrolSession;
+                            description
+                              "Name of the action to be triggered";
+                        }
+                    }
+                }
+
+                description
+                  "Sensor control linked with the session";
+            }
+
+            container twamp {
+                when "../sessiontype= 'twamp' and  ../orchestratorType = 'agent'";
+                uses accedian-twamp:twamp-sender;
+                uses accedian-twamp:twamp-reflector;
+                uses accedian-twamp:twamp-ctrl-client-connection;
+                description
+                  "Top level container for TWAMP protocol";
+            }
+            container throughput {
+                when "../sessiontype= 'throughput' and ../orchestratorType = 'agent'";
+
+                uses accedian-throughput:throughput-group;
+                description
+                  "Top level container for Throughput protocol || For Sensor Control Throughput is not supported";
+            }
+
+            uses session-statistics;
+        }
+    }
+    // WORKAROUND END: accedian-session.yang submodule manual include due to missing diff-deps
+
+    
+    container sessions {
+        description
+          "Root level container for Sessions";
+        uses session-list-group;
+    }
+
+    container idGenerator {
+        description
+          "container to store UUIDs";
+        action generateUUID {
+            output{
+                leaf uuid {
+                    type string;
+                    description
+                      "Generated of UUID";
+                }
+            }
+        }
+    }
+}
+
+
+

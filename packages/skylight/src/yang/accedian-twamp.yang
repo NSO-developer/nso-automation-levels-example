@@ -1,0 +1,343 @@
+module accedian-twamp {
+    yang-version 1.1;
+    namespace "urn:accedian:params:xml:ns:yang:accedian-twamp";
+    prefix accedian-twamp;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    organization
+      "Accedian";
+
+    contact
+      "Web URL: https://accedian.com/
+       E-mail: info@accedian.com
+          Phone:   1.514.331.6181 or +1.866.685.8181";
+
+    description
+      "This yang module defines Accedian TWAMP session configuration";
+
+    revision 2022-02-15 {
+        description
+          "Initial Revision";
+        reference
+          "accedian-twamp : TWAMP configuration";
+    }
+
+    // container ctrl-client-connection {    
+    grouping twamp-ctrl-client-connection {
+        description
+          "Group of Contol clinet parameters";
+
+        leaf controlAddr {
+            type inet:ip-address;
+            default "8.8.8.8";
+            description
+              "control ip address for twamp";
+        }
+        leaf controlPort {
+            type inet:port-number;
+            default "862";
+            description
+              "controller port number for twamp";
+        }
+        leaf controlDscp {
+            type inet:dscp;
+            default "0";
+            description
+              "Controller dscp for twamp | This parameter is need to be configured for  Skylight Sensor Agent Orchestrator only";
+        }
+        leaf controlVPrio {
+            type  uint16;
+            default "0";
+            description
+              "controller vprio value for twamp| This parameter is need to be configured for  Skylight Control Orchestrator only";
+        }
+        leaf controlLegacy {
+            type  boolean;
+            default false;
+            description
+              "controller legacy value for twamp";
+        }
+        leaf tos {
+            type uint8 {
+                range "0..255";
+            }
+            default 0;
+            description
+              "identifies tos (Type of Service). Default value is 0 | This parameter is need to be configured for  Skylight Control Orchestrator only";
+        }
+    }
+
+    grouping twamp-sender {
+        description
+          "Group of TWAMP sender parameter";
+
+        leaf senderAddr {
+            type inet:ip-address;
+            default "8.8.8.8";
+            description
+              "Ip address for twamp agent |This parameter is need to be configured for  Skylight Sensor Agent Orchestrator only";
+        }
+        leaf senderPort {
+            type uint32{
+              range "1..65535";
+            }
+            default "15000";
+            description
+              "port number for twamp agent";
+        }
+        leaf senderInterface {
+            type string;
+            description
+              "Interface of the connection | This parameter is need to be configured for Skylight Sensor Control Orchestrator only";
+        }
+        leaf senderPlsize {
+            type uint32{
+              range "41..1472";
+            }
+             default "82";
+            description
+              "sender pl size for twamp | This parameter is need to be configured for  Skylight Sensor Agent Orchestrator only";
+        }
+        leaf senderRate {
+            type uint32{
+              range "1..1000";
+            }
+            default  10;
+            
+            description
+              "sender rate for twamp | This parameter is need to be configured for  Skylight Sensor Agent Orchestrator only";
+        }
+        leaf senderDscp {
+            type inet:dscp;
+            default "32";
+            description
+              "sender dscp value for twamp";
+        }
+        leaf senderTtl {
+            type uint32{
+              range "0..255";
+            }
+            default 255;
+            
+            description
+              "sender ttl value for twamp";
+        }
+        leaf senderVPrio {
+            type uint32{
+              range "0..7";
+            }
+            description
+              "sender Vprio value for twamp";
+        }
+    }
+    grouping twamp-reflector {
+        description
+          "Group of TWAMP reflector parameter";
+
+        leaf reflectorAddr {
+            type inet:ip-address;
+            default "8.8.8.8";
+            description
+              "reflector ip address for twamp | This parameter is need to be configured for  Skylight Sensor Agent Orchestrator only";
+        }
+        leaf reflectorPort {
+            type inet:port-number;
+            default "862";
+            description
+              "reflector port number for twamp";
+        }
+        leaf reflectorInterface {
+            type string;
+            description
+              "Interface of the connection | This parameter is need to be configured for  Skylight Sensor Control Orchestrator only";
+        }
+        leaf reportInterval {
+            type uint32{
+              range "1..900";
+            }
+            default 30;
+            
+            description
+              "interval value for twamp";
+        }
+    }
+    container twampClient {
+        description
+          "Represents TWAMP client";
+
+        uses twamp-ctrl-client-connection;
+    }
+    container twampServer {
+
+        presence
+          "twampServer";
+        description
+          "Represents TWAMP server";
+        leaf serverAdminState {
+            type boolean;
+            mandatory "true";
+            description
+              "Indicates whether this device is allowed to run
+               TWAMP to respond to control/test sessions";
+        }
+        leaf serverTcpPort {
+            type inet:port-number;
+            default "862";
+            description
+              "TWAMP server port";
+        }
+        leaf servwait {
+            type uint32 {
+                range 1..604800;
+            }
+            default 900;
+            description
+              "SERVWAIT (TWAMP Control (TCP) session timeout),
+               default value is 900";
+        }
+        leaf dscp {
+            type inet:dscp;
+            description
+              "The DSCP value to be placed in the IP header
+               of the TWAMP TCP Control packets generated by the Server";
+        }
+        leaf count {
+            type uint32 {
+                range 1024..4294967295;
+            }
+            description
+              "count parameter";
+        }
+        leaf maxCount {
+            type uint32 {
+                range 1024..4294967295;
+            }
+            default 32768;
+            description
+              "Maximum count parameter";
+        }
+
+        leaf salt {
+            
+            type string ;
+            config "false";
+            description
+              "Salt MUST be generated pseudo-randomly";
+        }
+        leaf serverIv {
+            
+            type string {
+                length "1..16";
+            }
+            config "false";
+            description
+              "16 octets, Server-IV is generated randomly
+               by the Control-Client.";
+        }
+        leaf challenge {
+            
+            type string ;
+            config "false";
+            description
+              "Challenge is a random sequence of octets
+               generated by the Server";
+        }
+
+        list twampServerCtrlConnection {
+            
+            key "clientIp clientTcpPort serverIp serverTcpPort";
+            config "false";
+            description
+              "Represents TWAMP server control connection parameters";
+            leaf clientIp {
+                type inet:ip-address;
+                description
+                  "client IP Address";
+            }
+            leaf clientTcpPort {
+                type inet:port-number;
+                description
+                  "client TCP Port";
+            }
+            leaf serverIp {
+                type inet:ip-address;
+                description
+                  "Server IP Address";
+            }
+            leaf serverTcpPort {
+                type inet:port-number;
+                description
+                  "Server TCP Port";
+            }
+            leaf serverCtrlConnectionState {
+                type enumeration {
+                    enum "active" {
+                        description
+                          "State is active";
+                    }
+                    enum "servwait" {
+                        description
+                          "state is server waiting";
+                    }
+                }
+                description
+                  "TWAMP server Control Connection State";
+            }
+            leaf dscp {
+                type inet:dscp;
+                description
+                  "The DSCP value used in the header of the TCP
+                   control packets sent by the Server for this control
+                   connection. This will usually be the same value as is
+                   configured for twampServer:dscp under the twampServer.
+                   However, in the event that the user re-configures
+                   twampServer:dscp after this control connection is already
+                   in progress, this read-only value will show the actual
+                   dscp value in use by this control connection.";
+            }
+
+            leaf count {
+                type uint32 {
+                    range 1024..4294967295;
+                }
+                description
+                  "The count value that is in use by this control
+                   connection. This will usually be the same value as is
+                   configured under twampServer. However, in the event that
+                   the user re-configured twampServer:count after this control
+                   connection is already in progress, this read-only value
+                   will show the actual count that is in use for this
+                   control connection.";
+            }
+            leaf maxCount {
+                type uint32 {
+                    range 1024..4294967295;
+                }
+                description
+                  "The maxCount value that is in use by this
+                   control connection. This will usually be the same value
+                   as is configured under twampServer. However, in the event
+                   that the user re-configured twampServer:maxCount after
+                   this control connection is already in progress, this
+                   read-only value will show the actual maxCount that is
+                   in use for this control connection.";
+            }
+        }
+    }
+
+    container twampSender {
+        description
+          " Represents TWAMP Sender configuration";
+
+        uses twamp-sender;
+    }
+
+    container twampReflector {
+        description
+          " Represents TWAMP Reflector configuration";
+        uses twamp-reflector;
+    }
+}
