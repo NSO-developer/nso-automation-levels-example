@@ -1,6 +1,6 @@
-module subscriber-server {
+module subscriber {
   yang-version 1.1;
-  namespace "http://tail-f.com/ns/cleu24/tecops-2665/subscriber-server";
+  namespace "http://tail-f.com/ns/cleu24/tecops-2665/subscriber";
   prefix "tc-subscriber";
 
   import ietf-inet-types {
@@ -9,7 +9,7 @@ module subscriber-server {
 
 
   /* DATA NODES */
-  container subscriber-server {
+  container subscriber {
     list subscribers {
       key subscriber-id;
       leaf subscriber-id { type string; }

@@ -9,7 +9,12 @@ build-packages:
 
 netsim:
 	@echo "\n#### Building netsim network"
-	@ncs-netsim create-network packages/skylight 1 skylight
+	@ncs-netsim \
+		create-network packages/skylight   1 skylight      \
+		create-network packages/origin     2 origin        \
+		create-network packages/subscriber 2 subscriber    \
+		create-network packages/edge       1 edge          \
+		create-network packages/origin     1 cpe
 
 start-netsims: netsim
 	@echo "\n#### Starting netsim network"

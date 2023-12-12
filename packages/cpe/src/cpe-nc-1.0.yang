@@ -1,0 +1,13 @@
+module cpe-nc-1.0 {
+  yang-version 1.1;
+  namespace "http://tail-f.com/ns/ned-id/cpe-nc-1.0";
+  prefix cpe-nc-1.0;
+
+  import cpe-nc {
+    prefix family;
+  }
+
+  identity cpe-nc-1.0 {
+    base family:cpe-nc;
+  }
+}

@@ -1,0 +1,13 @@
+module origin-nc-1.0 {
+  yang-version 1.1;
+  namespace "http://tail-f.com/ns/ned-id/origin-nc-1.0";
+  prefix origin-nc-1.0;
+
+  import origin-nc {
+    prefix family;
+  }
+
+  identity origin-nc-1.0 {
+    base family:origin-nc;
+  }
+}
