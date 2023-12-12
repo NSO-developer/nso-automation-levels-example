@@ -98,12 +98,26 @@ module streaming {
     description "";
     ncs:self-as-service-status;
 
+    ncs:component-type "ncs:self" {
+      ncs:state "ncs:init";
+      ncs:state "ncs:ready";
+    }
+
     ncs:component-type "dc" {
       ncs:state "ncs:init";
-      ncs:state "streaming:skylight-configured";
-      ncs:state "streaming:media-origin-monitored";
+      ncs:state "streaming:skylight-configured" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
+      ncs:state "streaming:media-origin-monitored" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
       ncs:state "streaming:fw-configured" {
         ncs:create {
+          ncs:nano-callback;
           ncs:pre-condition {
             ncs:monitor
               "/streaming:dc[name = $SERVICE/dc]" {
@@ -119,6 +133,7 @@ module streaming {
       ncs:state "ncs:init";
       ncs:state "streaming:connected-to-dc" {
         ncs:create {
+          ncs:nano-callback;
           ncs:pre-condition {
             ncs:monitor
               "$SERVICE/plan/component[type='streaming:dc']/state[name='ncs:ready']" {
@@ -127,7 +142,11 @@ module streaming {
           }
         }
       }
-      ncs:state "streaming:connected-to-skylight";
+      ncs:state "streaming:connected-to-skylight" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
       ncs:state "ncs:ready";      
     }
   }
@@ -137,6 +156,9 @@ module streaming {
     ncs:plan-outline-ref "streaming:edge-plan";
 
     ncs:selector {
+      ncs:create-component "'self'" {
+        ncs:component-type-ref "ncs:self";
+      }
       ncs:create-component "'dc'" {
         ncs:component-type-ref "streaming:dc";
       }
