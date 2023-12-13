@@ -1,0 +1,5 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0"
+                 servicepoint="edge-servicepoint"
+                 componenttype="streaming:edge"
+                 state="streaming:connected-to-dc">
+</config-template>
