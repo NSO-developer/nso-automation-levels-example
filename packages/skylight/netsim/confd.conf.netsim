@@ -180,8 +180,8 @@
   <notifications>
     <eventStreams>
       <stream>
-        <name>escEvent</name>
-        <description>ESC notifications</description>
+        <name>skylight-events</name>
+        <description>Skylight notifications</description>
         <replaySupport>true</replaySupport>
         <builtinReplayStore>
           <enabled>true</enabled>

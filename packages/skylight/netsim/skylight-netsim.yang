@@ -24,4 +24,13 @@ module skylight-netsim {
       }
     }
   }
+
+
+  notification skylight-event {
+    description
+      "Event emitted from the Skylight Netsim device.";
+    leaf random {
+      type uint32;
+    }
+  }
 }
