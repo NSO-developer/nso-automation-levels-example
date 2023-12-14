@@ -75,6 +75,7 @@ module accedian-common {
                 description
                   "throughput session";
             }
+            enum "trace";
         }
         description
           "Session Type";

@@ -499,9 +499,10 @@ module accedian-gateway-orchestrator {
     grouping interface-attributes-group {
         leaf endpointName {
 
-            type leafref{
+            /*type leafref{
                 path "/accedian-gateway-orchestrator:accedian-components/sensor-control/endpoints/endpoint/name";
-            }
+            }*/
+            type string;
             description
               "endpoint name connected with the session";
         }

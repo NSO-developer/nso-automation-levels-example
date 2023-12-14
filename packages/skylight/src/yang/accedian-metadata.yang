@@ -148,7 +148,7 @@ module accedian-metadata {
             // type uint32; // -90 to +90 range : how to define
             type decimal64 {
 
-                fraction-digits 6;
+                fraction-digits 8;
             }
             description
               "Latitude of the site";
@@ -158,7 +158,7 @@ module accedian-metadata {
             // type uint32; // -90 to +90 range : how to define
             type decimal64 {
 
-                fraction-digits 6;
+                fraction-digits 8;
             }
             description
               "longitude of the site";
@@ -209,6 +209,9 @@ module accedian-metadata {
                   "Object Name to tag with the monitored object session";
             }
             leaf actuatorName {
+            	type string;
+            }
+            leaf actuatorType {
             	type string;
             }
             leaf reflectorName {

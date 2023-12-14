@@ -93,17 +93,19 @@ submodule accedian-session {
     grouping interface-attributes-group {
         leaf endpointName {
 
-            type leafref{
+            /*type leafref{
                 path "/gateway-orchestrator:accedian-components/sensor-control/endpoints/endpoint/name";
-            }
+            }*/
+            type string;
             description
               "endpoint name connected with the session";
         }
         leaf interfaceName {
             config false;
-            type leafref{
+            /*type leafref{
                 path "/gateway-orchestrator:accedian-components/sensor-control/endpoints/endpoint[name=current()/../endpointName]/interfaces/interface/name";
-            }
+            }*/
+            type string;
             description
               "endpoint interface connected with the session";
         }
@@ -116,9 +118,10 @@ submodule accedian-session {
 
         leaf ip-address {
             config false;
-            type leafref{
+            /*type leafref{
                 path "/gateway-orchestrator:accedian-components/sensor-control/endpoints/endpoint[name=current()/../endpointName]/interfaces/interface[name=current()/../interfaceName]/ipaddress/ip";
-            }
+            }*/
+            type string;
             description
               "ip address";
         }

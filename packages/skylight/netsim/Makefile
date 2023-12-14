@@ -1,0 +1,3 @@
+DIR = ..
+
+include $(DIR)/Makefile
