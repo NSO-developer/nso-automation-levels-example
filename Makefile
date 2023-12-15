@@ -10,13 +10,12 @@ build-packages:
 netsim:
 	@echo "\n#### Building netsim network"
 	@ncs-netsim \
-		create-network packages/skylight   1 skylight      \
+		create-network packages/skylight   2 skylight      \
 		create-network packages/origin     2 origin        \
 		create-network packages/subscriber 2 subscriber    \
-		create-network packages/edge       1 edge          \
-		create-network packages/origin     1 cpe
+		create-network packages/edge       2 edge          \
+		create-network packages/origin     2 cpe
 	@ncs-netsim ncs-xml-init > ncs-cdb/netsim-init.xml
-
 
 start-netsims: netsim
 	@echo "\n#### Starting netsim network"
@@ -25,6 +24,8 @@ start-netsims: netsim
 start-nso: ncs.conf
 	@echo "\n#### Starting NSO"
 	@ncs --status > /dev/null 2>&1; if [ $$? = 0 ]; then echo "NSO already running, but if you updated any packages, you need to reload them inside NSO: packages reload"; else ncs -c ncs.conf --with-package-reload; fi
+	@./netsim-simulate-jitter.sh dc0 20
+	@./netsim-simulate-jitter.sh dc1 25
 
 start-cli:
 	@echo "\n#### Entering NSO Command Line Interface as user admin"
@@ -37,4 +38,5 @@ stop:
 clean: stop
 	@for p in packages/*; do echo "\n#### Cleaning $$p"; make -C $$p/src clean; done
 	@rm -rf netsim
+	@rm ncs-cdb/netsim-init.xml
 	@ncs-setup --reset

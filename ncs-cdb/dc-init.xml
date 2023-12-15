@@ -1,0 +1,14 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <dc xmlns="http://com/example/basic-streaming/streaming">
+    <name>dc0</name>
+    <fw>edge0</fw>
+    <media-origin>origin0</media-origin>
+    <skylight>skylight0</skylight>
+  </dc>
+  <dc xmlns="http://com/example/basic-streaming/streaming">
+    <name>dc1</name>
+    <fw>edge1</fw>
+    <media-origin>origin1</media-origin>
+    <skylight>skylight1</skylight>
+  </dc>
+</config>

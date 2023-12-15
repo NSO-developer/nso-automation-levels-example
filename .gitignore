@@ -1,9 +1,15 @@
 /logs/*
+/lux_logs
 /ncs-cdb/*.cdb
 /ncs-cdb/*.lock
+/ncs-cdb/netsim-init.xml
 /netsim
-/packages/*/load-dir/*
+/packages/**/load-dir/*
+/packages/**/*.beam
+/packages/*/netsim/__init__.py
+/packages/*/netsim/*_ns.py
 /packages/*/netsim/*.fxs
+/packages/*/package-meta-data.xml
 /packages/*/src/ncsc-out
 /state/**
 /storedstate
