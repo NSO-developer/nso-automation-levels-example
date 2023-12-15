@@ -15,6 +15,8 @@ netsim:
 		create-network packages/subscriber 2 subscriber    \
 		create-network packages/edge       1 edge          \
 		create-network packages/origin     1 cpe
+	@ncs-netsim ncs-xml-init > ncs-cdb/netsim-init.xml
+
 
 start-netsims: netsim
 	@echo "\n#### Starting netsim network"
