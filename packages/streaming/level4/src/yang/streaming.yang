@@ -68,6 +68,12 @@ module streaming {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
+      # Assumes the NED ID for edge devices starts with 'edge'
+      # More formal would be to use the NED identity, but that would require
+      # importing the NED YANG module.
+      must "starts-with(deref(.)/../ncs:device-type/ncs:netconf/ncs:ned-id, 'edge')" {
+        error-message "Only the name of an edge device makes sense here.";
+      }
     }
   }
 
