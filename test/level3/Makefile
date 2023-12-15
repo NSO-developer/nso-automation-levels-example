@@ -1,5 +1,5 @@
 # Mandatory targets
-TEST_PACKAGE_STORE=$(W)/lib/ncs/test/lux/test_package_store
+TEST_PACKAGE_STORE=../../
 
 build: netsim ncs ncs-packages
 
@@ -17,6 +17,7 @@ ncs-packages:
 	make -C packages/streaming/src all
 
 clean:
+	make -C $(TEST_PACKAGE_STORE) clean
 	rm -rf packages ncs-cdb logs lux_logs netsim state scripts README.ncs README.netsim
 	rm -f *.log confderr.* global.data rr sess _tmp* ncs.conf *.beam
 
@@ -31,16 +32,14 @@ stop:
 cli:
 	ncs_cli -u admin
 
-netsim: test-package-store
+netsim:
+	make -C $(TEST_PACKAGE_STORE) build-packages
 	rm -rf $@
 	ncs-netsim --dir $@ \
-		create-network $(TEST_PACKAGE_STORE)/router-nc-1.0   4 edge \
-		create-network $(TEST_PACKAGE_STORE)/router-nc-1.0   2 fw \
-		create-network $(TEST_PACKAGE_STORE)/router-nc-1.0   2 skylight \
-		create-network $(TEST_PACKAGE_STORE)/router-nc-1.0   2 mediaorigin
+		create-network $(TEST_PACKAGE_STORE)/packages/edge       4 edge \
+		create-network $(TEST_PACKAGE_STORE)/packages/origin     2 fw \
+		create-network $(TEST_PACKAGE_STORE)/packages/skylight   2 skylight \
+		create-network $(TEST_PACKAGE_STORE)/packages/origin     2 mediaorigin \
+		create-network $(TEST_PACKAGE_STORE)/packages/subscriber 2 subscriber
 .PHONY: netsim
 
-test-package-store:
-	$(MAKE) -C $(TEST_PACKAGE_STORE) all
-
-.PHONY: test-package-store
