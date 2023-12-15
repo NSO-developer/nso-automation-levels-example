@@ -13,7 +13,7 @@ ncs:
 	mv ncs.conf.tmp ncs.conf
 
 ncs-packages:
-	cp -R ../../packages/streaming-level3 packages/streaming
+	cp -R ../../packages/streaming-level4 packages/streaming
 	make -C packages/streaming/src all
 
 clean:

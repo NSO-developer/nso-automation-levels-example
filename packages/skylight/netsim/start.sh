@@ -30,10 +30,7 @@ if [ ! $first_time = 0 ]; then
    ## If there is anything we want to do after the
    ## first initial start, this is the place. An example could be
    ## to load CDB operational data from xml files
-   #confd_load -C esc_opdata.xml
 fi
-
-NCS_IPC_PORT=${CONFD_IPC_PORT} python3 skylight.py&
 
 exit $ret
 
