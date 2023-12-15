@@ -43,6 +43,14 @@
 
     !run show edge plan | notab
 """?
+edge edge0
+ plan component self self
+  state init
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state ready
+   status not-reached
+  back-track false
  plan component dc dc
   state init
    status reached
@@ -79,6 +87,15 @@
     ??Commit performed by admin
     !run show edge plan | notab
 """?
+edge edge0
+ plan component self self
+  state init
+   status reached
+   when   .*T.*:.*:[0-9]*
+  state ready
+   status reached
+   when   .*T.*:.*:[0-9]*
+  back-track false
  plan component dc dc
   state init
    status reached

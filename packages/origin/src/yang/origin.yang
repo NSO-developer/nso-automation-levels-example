@@ -1,7 +1,7 @@
-module video-origin-server {
+module origin {
   yang-version 1.1;
-  namespace "http://tail-f.com/ns/cleu24/tecops-2665/video-origin-server";
-  prefix "tc-origin";
+  namespace "http://tail-f.com/ns/cleu24/tecops-2665/origin";
+  prefix tc-origin;
 
 
   /* GROUPINGS */
@@ -39,16 +39,16 @@ module video-origin-server {
   }
 
   /* DATA NODES */
-  container video-origin-server {
+  container origin {
     description
-      "The video origin server.";
+      "The media origin server.";
 
     // Totals for the server
     uses egress;
 
     list content {
       description
-        "List of content available on the video origin server.";
+        "List of content available on the media origin server.";
 
       key content-id;
       leaf content-id {

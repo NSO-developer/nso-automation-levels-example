@@ -1,0 +1,36 @@
+module skylight-netsim {
+  namespace "http://tail-f.com/pkg/skylight-netsim";
+  prefix skylight-netsim;
+
+  import tailf-common { prefix tailf; }
+
+  organization "Cisco Systems";
+  contact "<support@tail-f.com>";
+
+  description
+    "Skylight netsim models.";
+
+  revision 2023-12-14 {
+    description
+      "Inital version.";
+  }
+
+  container skylight-netsim {
+    tailf:action send-notification {
+      tailf:actionpoint "skylight-send-notification";
+      input {
+      }
+      output {
+      }
+    }
+  }
+
+
+  notification skylight-event {
+    description
+      "Event emitted from the Skylight Netsim device.";
+    leaf random {
+      type uint32;
+    }
+  }
+}

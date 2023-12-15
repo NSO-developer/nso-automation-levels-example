@@ -1,0 +1,18 @@
+module edge-nc {
+  yang-version 1.1;
+  namespace "http://tail-f.com/ns/ned-id/edge-nc";
+  prefix edge-nc;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  import tailf-ncs-ned {
+    prefix ned;
+  }
+
+  identity edge-nc {
+    tailf:abstract;
+    base ned:netconf-ned-id;
+  }
+}

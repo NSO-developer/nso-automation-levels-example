@@ -1,0 +1,18 @@
+module origin-nc {
+  yang-version 1.1;
+  namespace "http://tail-f.com/ns/ned-id/origin-nc";
+  prefix origin-nc;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  import tailf-ncs-ned {
+    prefix ned;
+  }
+
+  identity origin-nc {
+    tailf:abstract;
+    base ned:netconf-ned-id;
+  }
+}

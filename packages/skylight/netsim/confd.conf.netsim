@@ -15,25 +15,22 @@
       <enabled>true</enabled>
     </operational>
   </cdb>
+  <encryptedStrings>
+    <DES3CBC>
+      <key1>abcdef0123456789</key1>
+      <key2>abcdef0123456789</key2>
+      <key3>abcdef0123456789</key3>
+      <initVector>abcdef0123456789</initVector>
+    </DES3CBC>
+    <AESCFB128>
+      <key>abcdef0123456789abcdef0123456789</key>
+      <initVector>abcdef0123456789abcdef0123456789</initVector>
+    </AESCFB128>
+  </encryptedStrings>
   <rollback>
     <enabled>true</enabled>
     <directory>./logs</directory>
   </rollback>
-  <encryptedStrings>
-    <DES3CBC>
-      <key1>0123456789abcdef</key1>
-      <key2>0123456789abcdef</key2>
-      <key3>0123456789abcdef</key3>
-      <initVector>0123456789abcdef</initVector>
-    </DES3CBC>
-    <AESCFB128>
-      <key>0123456789abcdef0123456789abcdef</key>
-      <initVector>0123456789abcdef0123456789abcdef</initVector>
-    </AESCFB128>
-    <AES256CFB128>
-      <key>0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef</key>
-    </AES256CFB128>
-  </encryptedStrings>
   <logs>
     <syslogConfig>
       <udp>
@@ -148,6 +145,10 @@
       <rollback-on-error>
         <enabled>true</enabled>
       </rollback-on-error>
+      <notification>
+        <enabled>true</enabled>
+      </notification>
+
       <actions>
         <enabled>true</enabled>
       </actions>
@@ -174,4 +175,23 @@
     <wrapInfo>true</wrapInfo>
     <showKeyName>false</showKeyName>
   </cli>
+
+
+  <notifications>
+    <eventStreams>
+      <stream>
+        <name>skylight-events</name>
+        <description>Skylight notifications</description>
+        <replaySupport>true</replaySupport>
+        <builtinReplayStore>
+          <enabled>true</enabled>
+          <dir>./</dir>
+          <maxSize>S10B</maxSize>
+          <maxFiles>50</maxFiles>
+        </builtinReplayStore>
+      </stream>
+    </eventStreams>
+  </notifications>
+
+
 </confdConfig>

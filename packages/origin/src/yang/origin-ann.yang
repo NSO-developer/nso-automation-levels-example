@@ -1,0 +1,34 @@
+module origin-ann {
+  yang-version 1.1;
+  namespace "http://tail-f.com/ns/cleu24/tecops-2665/origin-ann";
+  prefix tc-origin-ann;
+
+  import origin {
+    prefix tc-origin;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+
+  /* totals metrics */
+  tailf:annotate "/tc-origin:origin/tc-origin:egress-speed" {
+    tailf:callpoint "origin";
+  }
+  tailf:annotate "/tc-origin:origin/tc-origin:egress-traffic" {
+    tailf:callpoint "origin";
+  }
+
+  /* per content metrics */
+  tailf:annotate "/tc-origin:origin/tc-origin:content" +
+                 "/tc-origin:egress-speed" {
+    tailf:callpoint "origin";
+  }
+  tailf:annotate "/tc-origin:origin/tc-origin:content" +
+                 "/tc-origin:egress-traffic" {
+    tailf:callpoint "origin";
+  }
+  tailf:annotate "/tc-origin:origin/tc-origin:content" +
+                 "/tc-origin:buffer-fill" {
+    tailf:callpoint "origin";
+  }
+}
