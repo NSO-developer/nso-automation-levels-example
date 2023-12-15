@@ -2,7 +2,7 @@
   <name>cpe</name>
   <package-version>1.0</package-version>
   <description>Generated netconf package</description>
-  <ncs-min-version>6.3</ncs-min-version>
+  <ncs-min-version>6.1</ncs-min-version>
   <component>
     <name>cpe</name>
     <ned>
