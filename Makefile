@@ -5,7 +5,7 @@ build: build-packages netsim
 start: start-netsims start-nso start-cli
 
 build-packages:
-	@for p in packages/*; do echo "\n#### Building $$p"; make -C $$p/src; done
+	@for p in packages/*; do echo "\n#### Building $$p"; make -C $$p/src || exit; done
 
 netsim:
 	@echo "\n#### Building netsim network"
