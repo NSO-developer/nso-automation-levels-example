@@ -1,0 +1,107 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+
+  <aaa xmlns="http://tail-f.com/ns/aaa/1.1">
+    <authentication>
+      <users>
+        <user>
+          <name>admin</name>
+          <uid>65534</uid>
+          <gid>65534</gid>
+          <password>$0$admin</password>
+          <ssh_keydir>/var/ncs/homes/admin/.ssh</ssh_keydir>
+          <homedir>/var/ncs/homes/admin</homedir>
+        </user>
+        <user>
+          <name>oper</name>
+          <uid>65534</uid>
+          <gid>65534</gid>
+          <password>$0$oper</password>
+          <ssh_keydir>/var/ncs/homes/oper/.ssh</ssh_keydir>
+          <homedir>/var/ncs/homes/oper</homedir>
+        </user>
+        <user>
+          <name>public</name>
+          <uid>65534</uid>
+          <gid>65534</gid>
+          <!-- impossible hash value - no password will match -->
+          <password>$6$</password>
+          <ssh_keydir>/var/ncs/homes/public/.ssh</ssh_keydir>
+          <homedir>/var/ncs/homes/public</homedir>
+        </user>
+        <user>
+          <name>private</name>
+          <uid>65534</uid>
+          <gid>65534</gid>
+          <!-- impossible hash value - no password will match -->
+          <password>$6$</password>
+          <ssh_keydir>/var/ncs/homes/private/.ssh</ssh_keydir>
+          <homedir>/var/ncs/homes/private</homedir>
+        </user>
+      </users>
+    </authentication>
+  </aaa>
+
+  <nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm">
+    <write-default>permit</write-default>
+    <groups>
+      <group>
+        <name>admin</name>
+        <user-name>admin</user-name>
+        <user-name>private</user-name>
+      </group>
+      <group>
+        <name>oper</name>
+        <user-name>oper</user-name>
+        <user-name>public</user-name>
+      </group>
+    </groups>
+    <rule-list>
+      <name>admin</name>
+      <group>admin</group>
+      <rule>
+        <name>any-access</name>
+        <action>permit</action>
+      </rule>
+      <cmdrule xmlns="http://tail-f.com/yang/acm">
+        <name>any-command</name>
+        <action>permit</action>
+      </cmdrule>
+    </rule-list>
+    <rule-list>
+      <name>any-group</name>
+      <group>*</group>
+      <rule>
+        <name>tailf-aaa-password-change</name>
+        <module-name>tailf-aaa</module-name>
+        <path>/aaa/authentication/users/user[name='$USER']/change-password</path>
+        <access-operations>read exec</access-operations>
+        <action>permit</action>
+      </rule>
+      <rule>
+        <name>tailf-aaa-user</name>
+        <module-name>tailf-aaa</module-name>
+        <path>/user[name='$USER']</path>
+        <access-operations>create read update delete</access-operations>
+        <action>permit</action>
+      </rule>
+      <rule>
+        <name>tailf-webui-user</name>
+        <module-name>tailf-webui</module-name>
+        <path>/webui/data-stores/user-profile[username='$USER']</path>
+        <access-operations>create read update delete</access-operations>
+        <action>permit</action>
+      </rule>
+      <cmdrule xmlns="http://tail-f.com/yang/acm">
+        <name>c-logout</name>
+        <command>logout</command>
+        <action>deny</action>
+      </cmdrule>
+      <cmdrule xmlns="http://tail-f.com/yang/acm">
+        <name>j-logout</name>
+        <command>request system logout</command>
+        <action>deny</action>
+      </cmdrule>
+    </rule-list>
+  </nacm>
+
+</config>
