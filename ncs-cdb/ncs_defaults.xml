@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<config:config xmlns:config="http://tail-f.com/ns/config/1.0"
+               xmlns="http://tail-f.com/ns/ncs">
+
+  <java-vm>
+      <stdout-capture>
+        <file>./logs/ncs-java-vm.log</file>
+      </stdout-capture>
+      <jmx>
+        <jndi-address>127.0.0.1</jndi-address>
+        <jndi-port>9902</jndi-port>
+        <jmx-address>127.0.0.1</jmx-address>
+        <jmx-port>9901</jmx-port>
+      </jmx>
+  </java-vm>
+
+  <smart-license>
+    <smart-agent>
+      <stdout-capture>
+        <file>./logs/ncs-smart-licensing.log</file>
+      </stdout-capture>
+    </smart-agent>
+  </smart-license>
+
+  <python-vm>
+    <logging>
+        <log-file-prefix>./logs/ncs-python-vm</log-file-prefix>
+    </logging>
+  </python-vm>
+
+  <devices>
+    <global-settings>
+      <trace-dir>./logs</trace-dir>
+    </global-settings>
+
+    <mib-group >
+      <name>snmp</name>
+      <mib-module>SNMP*</mib-module>
+    </mib-group>
+
+    <authgroups>
+      <group>
+        <name>default</name>
+        <umap>
+          <local-user>admin</local-user>
+          <remote-name>admin</remote-name>
+          <remote-password>admin</remote-password>
+        </umap>
+        <umap>
+          <local-user>oper</local-user>
+          <remote-name>oper</remote-name>
+          <remote-password>oper</remote-password>
+        </umap>
+      </group>
+
+      <snmp-group>
+        <name>default</name>
+        <default-map>
+          <community-name>public</community-name>
+        </default-map>
+        <umap>
+          <local-user>admin</local-user>
+          <usm>
+            <remote-name>admin</remote-name>
+            <security-level>auth-priv</security-level>
+            <auth>
+              <sha>
+                <remote-password>$0$admin</remote-password>
+              </sha>
+            </auth>
+            <priv>
+              <aes>
+                <remote-password>$0$admin</remote-password>
+              </aes>
+            </priv>
+          </usm>
+        </umap>
+      </snmp-group>
+    </authgroups>
+  </devices>
+
+  <services>
+    <logging>
+      <logger>
+        <name>default</name>
+        <log-entry-level>info</log-entry-level>
+      </logger>
+    </logging>
+    <global-settings>
+      <collect-forward-diff>true</collect-forward-diff>
+    </global-settings>
+  </services>
+
+  <cluster>
+    <authgroup>
+      <name>default</name>
+      <default-map>
+        <same-user/>
+        <same-pass/>
+      </default-map>
+      <umap>
+        <local-user>admin</local-user>
+        <same-user/>
+        <remote-password>admin</remote-password>
+      </umap>
+      <umap>
+        <local-user>oper</local-user>
+        <same-user/>
+        <remote-password>oper</remote-password>
+      </umap>
+    </authgroup>
+  </cluster>
+
+
+</config:config>
