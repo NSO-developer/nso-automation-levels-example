@@ -1,4 +1,5 @@
-/logs/*
+/logs/**
+!/logs/.gitignore
 /lux_logs
 /ncs-cdb/*.cdb
 /ncs-cdb/*.lock
@@ -12,4 +13,5 @@
 /packages/*/package-meta-data.xml
 /packages/*/src/ncsc-out
 /state/**
+!/state/.gitignore
 /storedstate
