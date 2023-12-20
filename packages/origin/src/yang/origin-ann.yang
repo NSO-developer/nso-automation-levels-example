@@ -11,6 +11,15 @@ module origin-ann {
   }
 
   /* totals metrics */
+
+  /* ingest */
+
+  tailf:annotate "/tc-origin:origin/tc-origin:buffer-fill" {
+    tailf:callpoint "origin";
+  }
+
+  /* egress */
+
   tailf:annotate "/tc-origin:origin/tc-origin:egress-speed" {
     tailf:callpoint "origin";
   }
@@ -18,11 +27,18 @@ module origin-ann {
     tailf:callpoint "origin";
   }
 
+
   /* per content metrics */
+
+  /* ingest */
+
   tailf:annotate "/tc-origin:origin/tc-origin:content" +
                  "/tc-origin:egress-speed" {
     tailf:callpoint "origin";
   }
+
+  /* egress */
+
   tailf:annotate "/tc-origin:origin/tc-origin:content" +
                  "/tc-origin:egress-traffic" {
     tailf:callpoint "origin";

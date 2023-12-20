@@ -7,7 +7,7 @@ start: start-netsims start-nso start-cli
 build-packages:
 	@for p in packages/*; do echo "\n#### Building $$p"; make -C $$p/src || exit; done
 
-netsim:
+netsim: build-packages
 	@echo "\n#### Building netsim network"
 	@ncs-netsim \
 		create-network packages/skylight   2 skylight      \
