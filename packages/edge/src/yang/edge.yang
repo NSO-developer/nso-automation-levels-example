@@ -6,6 +6,9 @@ module edge {
   import ietf-inet-types {
     prefix inet;
   }
+  import tailf-common {
+    prefix tailf;
+  }
 
 
   /* GROUPINGS */
@@ -112,5 +115,12 @@ module edge {
       uses ingress;
       uses egress;
     }
+  }
+
+  /* RPCs */
+  rpc toggle-jitter {
+    tailf:actionpoint toggle-jitter;
+    description
+      "Toggle high/low jitter, this will trigger a data center switch.";
   }
 }

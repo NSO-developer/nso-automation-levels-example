@@ -44,34 +44,28 @@ module edge-ann {
 
   /* ingest */
 
-  tailf:annotate "/tc-edge:edge/tc-edge:content" +
-                 "/tc-edge:buffer-fill" {
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:buffer-fill" {
     tailf:callpoint "edge";
   }
 
   /* ingress */
 
-  tailf:annotate "/tc-edge:edge/tc-edge:content" +
-                 "/tc-edge:egress-speed" {
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:egress-speed" {
     tailf:callpoint "edge";
   }
-  tailf:annotate "/tc-edge:edge/tc-edge:content" +
-                 "/tc-edge:egress-traffic" {
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:egress-traffic" {
     tailf:callpoint "edge";
   }
-  tailf:annotate "/tc-edge:edge/tc-edge:content" +
-                 "/tc-edge:jitter" {
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:jitter" {
     tailf:callpoint "edge";
   }
 
   /* egress */
 
-  tailf:annotate "/tc-edge:edge/tc-edge:content" +
-                 "/tc-edge:egress-speed" {
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:egress-speed" {
     tailf:callpoint "edge";
   }
-  tailf:annotate "/tc-edge:edge/tc-edge:content" +
-                 "/tc-edge:egress-traffic" {
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:egress-traffic" {
     tailf:callpoint "edge";
   }
 }

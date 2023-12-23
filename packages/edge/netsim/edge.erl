@@ -3,8 +3,6 @@
 -include_lib("econfd.hrl").
 -include("econfd_errors.hrl").
 
--export([toggle_jitter/0]).
-
 -on_load(on_load/0).
 
 on_load() ->
@@ -42,8 +40,9 @@ init() ->
                               get_elem  = fun get_elem/2},
     ok = econfd:register_data_cb(Daemon, DataCbs),
 
-    %% FIXME
-    %% * add toggle_jitter rpc
+    ActionCbs = #confd_action_cb{actionpoint = 'toggle-jitter',
+                                 action = fun toggle_jitter/4},
+    ok = econfd:register_action_cb(Daemon, ActionCbs),
 
     ok = econfd:register_done(Daemon),
 
@@ -57,7 +56,7 @@ init() ->
 loop([{high_jitter, HighJitter}] = State) ->
     receive
         {From, toggle_jitter} ->
-            From ! {edge_dp, {ok, not HighJitter}},
+            From ! {edge_dp, ok},
             loop([{high_jitter, not HighJitter}]);
 
         {From, {get_elem, ['buffer-fill' | _]}} ->
@@ -97,7 +96,7 @@ get_elem(_Tx, Path) ->
               not_found
     end.
 
-toggle_jitter() ->
+toggle_jitter(_Uinfo, _Name, _IKP, _Params) ->
     edge_dp ! {self(), toggle_jitter},
     receive
         {edge_dp, Res} ->
