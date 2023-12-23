@@ -61,4 +61,4 @@ install:
 	cp -af $(NCS_DIR)/netsim/confd/etc/confd/ssh $${DEST_DIR}
 
 clean:
-	@rm -f *.fxs
+	@rm -f *.fxs *.beam

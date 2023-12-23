@@ -50,10 +50,10 @@ module edge-ann {
 
   /* ingress */
 
-  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:egress-speed" {
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:ingress-speed" {
     tailf:callpoint "edge";
   }
-  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:egress-traffic" {
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:ingress-traffic" {
     tailf:callpoint "edge";
   }
   tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:jitter" {

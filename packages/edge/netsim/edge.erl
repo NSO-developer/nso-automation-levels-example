@@ -3,6 +3,13 @@
 -include_lib("econfd.hrl").
 -include("econfd_errors.hrl").
 
+
+-define(NS, 'http://tail-f.com/ns/cleu24/tecops-2665/edge').
+
+-record(state, {maapi       :: econfd:socket(),
+                high_jitter :: boolean()}).
+
+
 -on_load(on_load/0).
 
 on_load() ->
@@ -33,6 +40,8 @@ init() ->
                                       {127,0,0,1}, ConfdPort),
     register(edge_dp, self()),
 
+    {ok, MaapiSock} = econfd_maapi:connect({127,0,0,1}, ConfdPort),
+
     TransCbs = #confd_trans_cbs{init = fun init_trans/1},
     ok = econfd:register_trans_cb(Daemon, TransCbs),
 
@@ -46,41 +55,43 @@ init() ->
 
     ok = econfd:register_done(Daemon),
 
-    loop([{high_jitter, false}]).
+    loop(#state{maapi = MaapiSock, high_jitter = false}).
 
 
-%% FIXME
 %% * separate total and per content metrics
 %% * mutliply per content metrics with length of list
 %% * set high and low jitter
-loop([{high_jitter, HighJitter}] = State) ->
+loop(#state{maapi = MaapiSock, high_jitter = HighJitter} = State) ->
     receive
+        %% rpc
         {From, toggle_jitter} ->
             From ! {edge_dp, ok},
-            loop([{high_jitter, not HighJitter}]);
+            loop(State#state{high_jitter = not HighJitter});
 
-        {From, {get_elem, ['buffer-fill' | _]}} ->
-            Base = 70,
-            Rand = rand:uniform(30),
-            From ! {edge_dp, {ok, {?C_UINT8, Base + Rand}}},
+        %% jitter
+        {From, {get_elem, [jitter | _]}} ->
+            N = num_instances(MaapiSock),
+            From ! {edge_dp, {ok, {?C_DECIMAL64, jitter(N, HighJitter)}}},
             loop(State);
 
-        {From, {get_elem, [jitter | _]}} ->
-            FractionDigits = 3,
-            Base =
-                case HighJitter of
-                    true  -> 10;
-                    false -> 0
-                end,
-            Rand = abs(rand:normal()),
-            Jitter = abs(trunc((Base + Rand) * 1000)),
-            From ! {edge_dp, {ok, {?C_DECIMAL64, {Jitter, FractionDigits}}}},
+        %% per content metrics
+        {From, {get_elem, ['buffer-fill', {_}, content | _]}} ->
+            From ! {edge_dp, {ok, {?C_UINT8, buffer_fill(1)}}},
+            loop(State);
+
+        {From, {get_elem, [_Leaf, {_}, content | _]}} ->
+            From ! {edge_dp, {ok, {?C_UINT64, traffic(1)}}},
+            loop(State);
+
+        %% totals metrics
+        {From, {get_elem, ['buffer-fill' | _]}} ->
+            N = num_instances(MaapiSock),
+            From ! {edge_dp, {ok, {?C_UINT8, buffer_fill(N)}}},
             loop(State);
 
         {From, {get_elem, _Path}} ->
-            Base = 10 * 1024 * 1024,
-            Rand = rand:uniform(1024 * 1024),
-            From ! {edge_dp, {ok, {?C_UINT64, Base + Rand}}},
+            N = num_instances(MaapiSock),
+            From ! {edge_dp, {ok, {?C_UINT64, traffic(N)}}},
             loop(State)
     end.
 
@@ -104,6 +115,43 @@ toggle_jitter(_Uinfo, _Name, _IKP, _Params) ->
     after 1000 ->
               error
     end.
+
+
+%% uint8
+buffer_fill(0) -> 0;
+buffer_fill(_) -> 70 + rand:uniform(30).
+
+-define(JITTER_FRACTION_DIGITS, 3).
+
+%% decimal64
+jitter(0, _) ->
+    {0, ?JITTER_FRACTION_DIGITS};
+jitter(_, HighJitter) ->
+    Base =
+        case HighJitter of
+            true  -> 10;
+            false -> 0
+        end,
+    Rand = abs(rand:normal()),
+    Jitter = abs(trunc((Base + Rand) * 1000)),
+    {Jitter, ?JITTER_FRACTION_DIGITS}.
+
+%% uint64
+traffic(N) ->
+    Base = 10 * 1024 * 1024,
+    Rand = rand:uniform(1024 * 1024),
+    N * (Base + Rand).
+
+num_instances(MaapiSock) ->
+    ok = econfd_maapi:start_user_session(MaapiSock, <<"admin">>, <<"maapi">>,
+                                         [<<"admin">>], {127,0,0,1},
+                                         ?CONFD_PROTO_TCP),
+    {ok, Th} = econfd_maapi:start_trans(MaapiSock, ?CONFD_RUNNING, ?CONFD_READ),
+    {ok, Num} =
+        econfd_maapi:num_instances(MaapiSock, Th, [content, [?NS|edge]]),
+    ok = econfd_maapi:finish_trans(MaapiSock, Th),
+    ok = econfd_maapi:end_user_session(MaapiSock),
+    Num.
 
 
 print(Fmt, Args) ->
