@@ -23,7 +23,7 @@ FXS = $(filter-out $(BUILTIN_FXS), \
 
 FLAGS = --yangpath ../src/yang
 
-all: $(FXS) vvsim.beam
+all: $(FXS) edge.beam
 
 
 %.fxs:  ../src/yang/%.yang
@@ -32,7 +32,7 @@ all: $(FXS) vvsim.beam
               echo "-a ../src/yang/$*-ann.yang"` \
           -c -o $@  $<
 
-vvsim.beam: vvsim.erl
+edge.beam: edge.erl
 	erlc -I $(NCS_DIR)/erlang/econfd/include $<
 
 # Invoked by netsim, who will sed substitute the %var% PORT variables
@@ -55,10 +55,10 @@ install:
 		sed -e 's/%NAME%/$(NAME)/g' -e 's/%COUNTER%/$(COUNTER)/g' -e 's/%TWO_DIGIT_COUNTER%/$(TWO_DIGIT_COUNTER)/g' \
 		  $$i > $${DEST_DIR}/cdb/`basename $$i`; \
 	done
-	cp vvsim.beam ${DEST_DIR}
+	cp edge.beam ${DEST_DIR}
 	for f in $(FXS); do cp $$f $${DEST_DIR}; done
 	cp -f $(EXTRA_FILES) $${DEST_DIR}
 	cp -af $(NCS_DIR)/netsim/confd/etc/confd/ssh $${DEST_DIR}
 
 clean:
-	@rm -f *.fxs
+	@rm -f *.fxs *.beam

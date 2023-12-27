@@ -1,0 +1,59 @@
+[doc Test devices]
+
+[config require=MAKE]
+
+[global fail_pattern=[Ee][Rr][Rr][Oo][Rr]]
+
+
+[macro ok]
+    !echo ==$$?==
+    ?==[0-9]+==
+[endmacro]
+
+
+[shell setup]
+    !${MAKE} start
+    ?+DEVICE edge0 OK STARTED
+    ?+DEVICE origin0 OK STARTED
+    ?+DEVICE skylight0 OK STARTED
+    ?DEVICE subscriber0 OK STARTED
+    [invoke ok]
+
+    !sleep 1
+
+
+[shell edge]
+    !. netsim/edge/edge0/env.sh
+    [invoke ok]
+
+    !ssh -o StrictHostKeyChecking=no -p $(env | sed -n '/CLI_SSH_PORT/ s/.*=// p') admin@localhost
+    ?password:
+    !admin
+    ?admin@edge0>
+
+    !show edge
+    ?edge buffer-fill \d+
+    ?edge ingress-speed \d+
+    ?edge ingress-traffic \d+
+    ?edge jitter\s*\d\.\d+
+    ?edge egress-speed \d+
+    ?edge egress-traffic \d+
+    ???[ok]
+    ?admin@edge0>
+
+    !request toggle-jitter
+    ???[ok]
+    ?admin@edge0>
+
+    !show edge jitter
+    ?edge jitter 1\d\.\d+
+    ???[ok]
+    ?admin@edge0>
+
+    !exit
+    ?SH-PROMPT:
+
+
+[cleanup]
+    !${MAKE} stop
+    [invoke ok]
