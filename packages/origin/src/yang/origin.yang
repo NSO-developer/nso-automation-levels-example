@@ -3,6 +3,10 @@ module origin {
   namespace "http://tail-f.com/ns/cleu24/tecops-2665/origin";
   prefix tc-origin;
 
+  import ietf-inet-types {
+    prefix inet;
+  }
+
 
   /* GROUPINGS */
   grouping ingest {
@@ -43,7 +47,17 @@ module origin {
     description
       "The media origin server.";
 
+    list edge {
+      description
+        "List of configured edge streamers.";
+      key hostname;
+      leaf hostname {
+        type inet:host;
+      }
+    }
+
     // Totals for the server
+    uses ingest;
     uses egress;
 
     list content {

@@ -6,9 +6,24 @@ module edge {
   import ietf-inet-types {
     prefix inet;
   }
+  import tailf-common {
+    prefix tailf;
+  }
 
 
   /* GROUPINGS */
+  grouping ingest {
+    leaf buffer-fill {
+      config false;
+      type uint8 {
+        range 0..100;
+      }
+      units "percent";
+      description
+        "Buffer fill in percent.";
+    }
+  }
+
   grouping ingress {
     leaf ingress-speed {
       config false;
@@ -42,27 +57,70 @@ module edge {
     }
   }
 
+  grouping egress {
+    leaf egress-speed {
+      config false;
+      type uint64 {
+        range 0..max;
+      }
+      units "KiB/s";
+      description
+        "Egress speed in KiB/s.";
+    }
+    leaf egress-traffic {
+      config false;
+      type uint64 {
+        range 0..max;
+      }
+      units "KiB";
+      description
+        "Egress traffic in KiB.";
+    }
+  }
+
 
   /* DATA NODES */
   container edge {
+    description
+      "The edge streaming server.";
 
-    leaf video-origin-server {
-        type inet:host;
+    leaf origin-server {
+      description
+        "The configured media origin server.";
+      type inet:host;
     }
 
     leaf subscriber-server {
-        type inet:host;
+      description
+        "The configured subscriber server.";
+      type inet:host;
     }
 
+    // Totals for the server
+    uses ingest;
+    uses ingress;
+    uses egress;
+
     list content {
+      description
+        "List of content available on the edge streamer server.";
+
       key content-id;
       leaf content-id {
         type string;
       }
 
-      leaf buffer-fill { type string; }
-
+      // Metrics per content
+      uses ingest;
       uses ingress;
+      uses egress;
     }
+  }
+
+  /* RPCs */
+  rpc toggle-jitter {
+    tailf:actionpoint toggle-jitter;
+    description
+      "Toggle high/low jitter, this will trigger a data center switch.";
   }
 }

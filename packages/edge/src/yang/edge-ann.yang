@@ -1,0 +1,71 @@
+module edge-ann {
+  yang-version 1.1;
+  namespace "http://tail-f.com/ns/cleu24/tecops-2665/edge-ann";
+  prefix tc-edge-ann;
+
+  import edge {
+    prefix tc-edge;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+
+  /* totals metrics */
+
+  /* ingest */
+
+  tailf:annotate "/tc-edge:edge/tc-edge:buffer-fill" {
+    tailf:callpoint "edge";
+  }
+
+  /* ingress */
+
+  tailf:annotate "/tc-edge:edge/tc-edge:ingress-speed" {
+    tailf:callpoint "edge";
+  }
+  tailf:annotate "/tc-edge:edge/tc-edge:ingress-traffic" {
+    tailf:callpoint "edge";
+  }
+
+  /* egress */
+
+  tailf:annotate "/tc-edge:edge/tc-edge:egress-speed" {
+    tailf:callpoint "edge";
+  }
+  tailf:annotate "/tc-edge:edge/tc-edge:egress-traffic" {
+    tailf:callpoint "edge";
+  }
+  tailf:annotate "/tc-edge:edge/tc-edge:jitter" {
+    tailf:callpoint "edge";
+  }
+
+
+  /* per content metrics */
+
+  /* ingest */
+
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:buffer-fill" {
+    tailf:callpoint "edge";
+  }
+
+  /* ingress */
+
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:ingress-speed" {
+    tailf:callpoint "edge";
+  }
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:ingress-traffic" {
+    tailf:callpoint "edge";
+  }
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:jitter" {
+    tailf:callpoint "edge";
+  }
+
+  /* egress */
+
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:egress-speed" {
+    tailf:callpoint "edge";
+  }
+  tailf:annotate "/tc-edge:edge/tc-edge:content/tc-edge:egress-traffic" {
+    tailf:callpoint "edge";
+  }
+}
