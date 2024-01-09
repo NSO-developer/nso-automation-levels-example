@@ -1,2 +1,76 @@
 TECOPS 2665
 ===========
+
+TBD
+
+USE CASE
+--------
+
+TBD
+
+edge streamer service
+
+data center switch
+* too high jitter
+* energy
+
+twamp service monitoring
+
+
+DEVICES
+-------
+
+The netsim devices for the edge and origin packages have data providers
+that will provide operational data for the configured content list. The
+device will have metrics for buffer fill, ingress and egress traffic,
+and also jitter. The values are random around a base value. It is
+possible to toggle a high/low jitter value with the toggle-jitter RPC.
+
+For instance logging into an edge device the initial content list is
+empty, and thus the operational data is zeroed.
+
+    edge0# show edge
+    edge buffer-fill 0
+    edge ingress-speed 0
+    edge ingress-traffic 0
+    edge jitter     0.0
+    edge egress-speed 0
+    edge egress-traffic 0
+
+Populating the content list with two elements will populate the
+operational data
+
+    edge0# config
+    edge0(config)# edge content "V for Vendetta"
+    edge0(config-content-V for Vendetta)# edge content Primer
+    edge0(config)# commit
+    Commit complete.
+    edge0(config)# exit
+    edge0# show edge
+    edge buffer-fill 94
+    edge ingress-speed 21421818
+    edge ingress-traffic 22737442
+    edge jitter     0.131
+    edge egress-speed 22198500
+    edge egress-traffic 21194120
+                    BUFFER  INGRESS   INGRESS           EGRESS    EGRESS
+    CONTENT ID      FILL    SPEED     TRAFFIC   JITTER  SPEED     TRAFFIC
+    ------------------------------------------------------------------------
+    Primer          98      11346476  10661960  0.377   11189595  10681591
+    V for Vendetta  90      10643824  11489777  0.929   11114149  10629172
+
+Toggle high jitter by invoking the toggle-jitter RPC
+
+    edge0# toggle-jitter
+    edge0# show edge
+    edge buffer-fill 73
+    edge ingress-speed 22963722
+    edge ingress-traffic 22160378
+    edge jitter     10.322
+    edge egress-speed 22282264
+    edge egress-traffic 21381530
+                    BUFFER  INGRESS   INGRESS           EGRESS    EGRESS
+    CONTENT ID      FILL    SPEED     TRAFFIC   JITTER  SPEED     TRAFFIC
+    ------------------------------------------------------------------------
+    Primer          83      10554788  11501184  10.82   10783739  10971589
+    V for Vendetta  92      11377185  10841050  10.083  11251753  10816474
