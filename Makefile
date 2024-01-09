@@ -8,18 +8,20 @@ build-packages:
 	@for p in packages/*; do echo "\n#### Building $$p"; make -C $$p/src || exit; done
 
 netsim: build-packages
-	@echo "\n#### Building netsim network"
-	@ncs-netsim \
-		create-network packages/skylight   2 skylight      \
-		create-network packages/origin     2 origin        \
-		create-network packages/subscriber 2 subscriber    \
-		create-network packages/edge       2 edge          \
-		create-network packages/origin     2 cpe
-	@ncs-netsim ncs-xml-init > ncs-cdb/netsim-init.xml
+	@if [ ! -d netsim ]; then                              \
+		echo "\n#### Building netsim network";               \
+		ncs-netsim                                           \
+			create-network packages/origin     2 origin        \
+			create-network packages/skylight   2 skylight      \
+			create-network packages/subscriber 2 subscriber    \
+			create-network packages/edge       2 edge          \
+			create-network packages/origin     2 cpe;          \
+		ncs-netsim ncs-xml-init > ncs-cdb/netsim-init.xml;   \
+	else echo "\n#### Netsim network already created"; fi
 
 start-netsims: netsim
 	@echo "\n#### Starting netsim network"
-	@ncs-netsim is-alive skylight0 | grep "DEVICE skylight0 OK"; if [ $$? = 0 ]; then echo "NETSIM network already running"; else ncs-netsim start; fi
+	@ncs-netsim is-alive origin0 | grep "DEVICE origin0 OK"; if [ $$? = 0 ]; then echo "NETSIM network already running"; else ncs-netsim start; fi
 
 start-nso: ncs.conf
 	@echo "\n#### Starting NSO"
