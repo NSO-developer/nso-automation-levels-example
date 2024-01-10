@@ -35,25 +35,29 @@ Key takeaways:
 USE CASE
 --------
 
-In this lab we have a video service with origin media servers for
-content in two data centers and edge streamers.
+This lab has a video service with origin media servers for content in
+two data centers and edge streamers.
 
 The goal is to take an existing service without any service monitoring
-and create a closed loop automated service. This is achieved by
-introducing monitoring and code which will manage the service according
-to the defined metrics and service quality levels.
+and create a closed loop automated service.
+
+This is achieved by introducing:
+* service and device monitoring,
+* code which will manage the service according to the defined metrics
+  and service quality levels.
 
 The service monitoring is done with TWAMP service monitoring with
 Accedian Skylight.
 
-In order to simulate service disruption the edge streamer device can
-simulate high jitter via the "toggle-jitter" RPC, see DEVICES section
-below. When high jitter occurs a data center switch should take place.
+The edge streamer device can simulate high jitter via the
+"toggle-jitter" RPC, see DEVICES section for further details. When the
+edge streamer device experiences high jitter, a service disruption occurs
+and a data center switch should take place.
 
-urthermore, the lab has simple web service that reports variable energy
+Furthermore, the lab has simple web service that reports variable energy
 prices that fluctuates over time. When the inactive data center's energy
-price goes below a certain threshhold than the active data center's
-energy price, a data center switch should also take place.
+price falls below the active data center's energy price plus a
+configurable threshhold, a data center switch should also take place.
 
 
 DEVICES
@@ -65,8 +69,8 @@ device will have metrics for buffer fill, ingress and egress traffic,
 and also jitter. The values are random around a base value. It is
 possible to toggle a high/low jitter value with the toggle-jitter RPC.
 
-For instance logging into an edge device the initial content list is
-empty, and thus the operational data is zeroed.
+When logging into an edge device the initial content list is empty, and
+thus the operational data is zeroed.
 
     edge0# show edge
     edge buffer-fill 0
@@ -77,7 +81,8 @@ empty, and thus the operational data is zeroed.
     edge egress-traffic 0
 
 Populating the content list with two elements will populate the
-operational data
+operational data. Note that the operational data metrics are real time
+values, subsequent readings will give different results!
 
     edge0# config
     edge0(config)# edge content "V for Vendetta"
