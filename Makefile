@@ -26,6 +26,8 @@ start-nso: ncs.conf
 	@ncs --status > /dev/null 2>&1; if [ $$? = 0 ]; then echo "NSO already running, but if you updated any packages, you need to reload them inside NSO: packages reload"; else ncs -c ncs.conf --with-package-reload; fi
 	@./netsim-simulate-jitter.sh dc0 20
 	@./netsim-simulate-jitter.sh dc1 25
+	@./netsim-simulate-energy-price.sh dc0 10
+	@./netsim-simulate-energy-price.sh dc1 5   
 
 start-cli:
 	@echo "\n#### Entering NSO Command Line Interface as user admin"
