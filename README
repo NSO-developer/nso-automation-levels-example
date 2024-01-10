@@ -1,20 +1,59 @@
 TECOPS 2665
 ===========
 
-TBD
+Reaching Network Automation Level 5: Principles and Practice
+
+Once the Adaptive Service Activation Scripts (Network Automation
+Level 2) are left behind, a world of life-cycle flexibility and
+stylistic freedom of the services running in our network. What can we
+use this flexibility for?
+
+In this lab, the participant will upgrade a pre-existing Network
+Services Orchestrator (NSO) service from Network Automation Level 3 to
+Level 5 by adding service health measurement and make it adapt to
+changes in the environment.
+
+The vision of the Internet Engineering Task Force (IETF) Application
+Level Traffic Optimization (ALTO) Working Group (WG) is to optimize the
+application and network together, so that the delivered service is
+delivered as well as possible to the collection of users. This might
+mean delivering this user's service from a data center that is not the
+closest one, but from another with less load or lower energy prices, and
+therefore less expensive to the customer. Moving service instances
+around becomes a natural part of the life-cycle.
+
+Prerequisites:
+* Basic programming skills in Python
+* Some familiarity with NSO services and YANG modules
+
+Key takeaways:
+* Hands-on experience with Network Automation Levels 3-5
+* Giddy feeling of power arising from services that adapt to their
+  environment
+
 
 USE CASE
 --------
 
-TBD
+In this lab we have a video service with origin media servers for
+content in two data centers and edge streamers.
 
-edge streamer service
+The goal is to take an existing service without any service monitoring
+and create a closed loop automated service. This is achieved by
+introducing monitoring and code which will manage the service according
+to the defined metrics and service quality levels.
 
-data center switch
-* too high jitter
-* energy
+The service monitoring is done with TWAMP service monitoring with
+Accedian Skylight.
 
-twamp service monitoring
+In order to simulate service disruption the edge streamer device can
+simulate high jitter via the "toggle-jitter" RPC, see DEVICES section
+below. When high jitter occurs a data center switch should take place.
+
+urthermore, the lab has simple web service that reports variable energy
+prices that fluctuates over time. When the inactive data center's energy
+price goes below a certain threshhold than the active data center's
+energy price, a data center switch should also take place.
 
 
 DEVICES
