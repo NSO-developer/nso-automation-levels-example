@@ -2,4 +2,27 @@
                  servicepoint="edge-servicepoint"
                  componenttype="streaming:edge"
                  state="streaming:connected-to-dc">
+<?set EDGE = {./name}?>
+<?set-root-node {/}?>
+<devices xmlns="http://tail-f.com/ns/ncs">
+   <device>
+     <name>{$EDGE}</name>
+     <config>
+       <edge xmlns="http://tail-f.com/ns/cleu24/tecops-2665/edge">
+         <origin-server>{/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]/address}</origin-server>
+       </edge>
+     </config>
+   </device>
+   <device>
+     <name>{/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]/name}</name>
+     <config>
+       <origin xmlns="http://tail-f.com/ns/cleu24/tecops-2665/origin">
+         <edge>
+           <hostname>{/ncs:devices/device[name=$EDGE]/address}</hostname>
+         </edge>
+         <?copy-tree {/ncs:devices/device[name=$EDGE]/config/tc-edge:edge}?>
+       </origin>
+     </config>
+   </device>
+ </devices>
 </config-template>
