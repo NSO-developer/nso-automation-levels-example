@@ -1,2 +1,120 @@
 TECOPS 2665
 ===========
+
+Reaching Network Automation Level 5: Principles and Practice
+
+Once the Adaptive Service Activation Scripts (Network Automation
+Level 2) are left behind, a world of life-cycle flexibility and
+stylistic freedom of the services running in our network. What can we
+use this flexibility for?
+
+In this lab, the participant will upgrade a pre-existing Network
+Services Orchestrator (NSO) service from Network Automation Level 3 to
+Level 5 by adding service health measurement and make it adapt to
+changes in the environment.
+
+The vision of the Internet Engineering Task Force (IETF) Application
+Level Traffic Optimization (ALTO) Working Group (WG) is to optimize the
+application and network together, so that the delivered service is
+delivered as well as possible to the collection of users. This might
+mean delivering this user's service from a data center that is not the
+closest one, but from another with less load or lower energy prices, and
+therefore less expensive to the customer. Moving service instances
+around becomes a natural part of the life-cycle.
+
+Prerequisites:
+* Basic programming skills in Python
+* Some familiarity with NSO services and YANG modules
+
+Key takeaways:
+* Hands-on experience with Network Automation Levels 3-5
+* Giddy feeling of power arising from services that adapt to their
+  environment
+
+
+USE CASE
+--------
+
+This lab has a video service with origin media servers for content in
+two data centers and edge streamers.
+
+The goal is to take an existing service without any service monitoring
+and create a closed loop automated service.
+
+This is achieved by introducing:
+* service and device monitoring,
+* code which will manage the service according to the defined metrics
+  and service quality levels.
+
+The service monitoring is done with TWAMP service monitoring with
+Accedian Skylight.
+
+The edge streamer device can simulate high jitter via the
+"toggle-jitter" RPC, see DEVICES section for further details. When the
+edge streamer device experiences high jitter, a service disruption occurs
+and a data center switch should take place.
+
+Furthermore, the lab has simple web service that reports variable energy
+prices that fluctuates over time. When the inactive data center's energy
+price falls below the active data center's energy price plus a
+configurable threshhold, a data center switch should also take place.
+
+
+DEVICES
+-------
+
+The netsim devices for the edge and origin packages have data providers
+that will provide operational data for the configured content list. The
+device will have metrics for buffer fill, ingress and egress traffic,
+and also jitter. The values are random around a base value. It is
+possible to toggle a high/low jitter value with the toggle-jitter RPC.
+
+When logging into an edge device the initial content list is empty, and
+thus the operational data is zeroed.
+
+    edge0# show edge
+    edge buffer-fill 0
+    edge ingress-speed 0
+    edge ingress-traffic 0
+    edge jitter     0.0
+    edge egress-speed 0
+    edge egress-traffic 0
+
+Populating the content list with two elements will populate the
+operational data. Note that the operational data metrics are real time
+values, subsequent readings will give different results!
+
+    edge0# config
+    edge0(config)# edge content "V for Vendetta"
+    edge0(config-content-V for Vendetta)# edge content Primer
+    edge0(config)# commit
+    Commit complete.
+    edge0(config)# exit
+    edge0# show edge
+    edge buffer-fill 94
+    edge ingress-speed 21421818
+    edge ingress-traffic 22737442
+    edge jitter     0.131
+    edge egress-speed 22198500
+    edge egress-traffic 21194120
+                    BUFFER  INGRESS   INGRESS           EGRESS    EGRESS
+    CONTENT ID      FILL    SPEED     TRAFFIC   JITTER  SPEED     TRAFFIC
+    ------------------------------------------------------------------------
+    Primer          98      11346476  10661960  0.377   11189595  10681591
+    V for Vendetta  90      10643824  11489777  0.929   11114149  10629172
+
+Toggle high jitter by invoking the toggle-jitter RPC
+
+    edge0# toggle-jitter
+    edge0# show edge
+    edge buffer-fill 73
+    edge ingress-speed 22963722
+    edge ingress-traffic 22160378
+    edge jitter     10.322
+    edge egress-speed 22282264
+    edge egress-traffic 21381530
+                    BUFFER  INGRESS   INGRESS           EGRESS    EGRESS
+    CONTENT ID      FILL    SPEED     TRAFFIC   JITTER  SPEED     TRAFFIC
+    ------------------------------------------------------------------------
+    Primer          83      10554788  11501184  10.82   10783739  10971589
+    V for Vendetta  92      11377185  10841050  10.083  11251753  10816474
