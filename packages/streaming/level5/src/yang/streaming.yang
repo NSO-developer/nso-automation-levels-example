@@ -153,6 +153,10 @@ module streaming {
       ncs:state "streaming:connected-to-dc" {
         ncs:create {
           ncs:nano-callback;
+          ncs:post-action-node "/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]" {
+            ncs:action-name "sync-from";
+            ncs:result-expr "result = 'true'";
+          }
         }
       }
       ncs:state "streaming:connected-to-skylight" {
