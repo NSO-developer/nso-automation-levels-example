@@ -30,6 +30,8 @@ start-nso: ncs.conf
 	@./netsim-simulate-jitter.sh dc1 25
 	@./netsim-simulate-energy-price.sh dc0 10
 	@./netsim-simulate-energy-price.sh dc1 5   
+	@ncs_cmd -u admin -c 'maction /ncs:devices/sync-from'
+	@ncs_load -u admin -lm edge_init.xml
 
 start-cli:
 	@echo "\n#### Entering NSO Command Line Interface as user admin"
