@@ -6,6 +6,9 @@ module origin {
   import ietf-inet-types {
     prefix inet;
   }
+  import tailf-common {
+    prefix tailf;
+  }
 
 
   /* GROUPINGS */
@@ -72,6 +75,14 @@ module origin {
       // Metrics per content
       uses ingest;
       uses egress;
+
     }
+  }
+
+  /* RPCs */
+  rpc load-from-storage {
+    tailf:actionpoint load-from-storage;
+    description
+      "Load the content from storage.";
   }
 }
