@@ -153,8 +153,10 @@ module streaming {
       ncs:state "streaming:connected-to-dc" {
         ncs:create {
           ncs:nano-callback;
-          ncs:post-action-node "/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]" {
-            ncs:action-name "sync-from";
+          ncs:post-action-node
+              "/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]" +
+              "/rpc/rpc-load-from-storage" {
+            ncs:action-name "load-from-storage";
             ncs:result-expr "result = 'true'";
           }
         }

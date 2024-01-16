@@ -5,6 +5,7 @@
 
 
 -define(NS, 'http://tail-f.com/ns/cleu24/tecops-2665/origin').
+-define(CONTENT_LOAD_TIME, 5000). % ms
 
 -record(state, {maapi :: econfd:socket()}).
 
@@ -48,6 +49,10 @@ init() ->
                               get_elem  = fun get_elem/2},
     ok = econfd:register_data_cb(Daemon, DataCbs),
 
+    ActionCbs = #confd_action_cb{actionpoint = 'load-from-storage',
+                                 action = fun load_from_storage/4},
+    ok = econfd:register_action_cb(Daemon, ActionCbs),
+
     ok = econfd:register_done(Daemon),
 
     loop(#state{maapi = MaapiSock}).
@@ -88,6 +93,9 @@ get_elem(_Tx, Path) ->
     after 1000 ->
               not_found
     end.
+
+load_from_storage(_Uinfo, _Name, _IKP, _Params) ->
+    timer:sleep(?CONTENT_LOAD_TIME).
 
 
 %% uint8
