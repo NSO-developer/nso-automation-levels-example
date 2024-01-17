@@ -21,16 +21,10 @@ class NanoServiceCallbacks(NanoService):
         '''Nano service create callback'''
         self.log.info('Nano create(state=', state, ')')
 
-        if state == 'streaming:vm-requested':
-            # Create and initialize the streaming instance
-            # Any '-' in streaming must be replaced with '_'
-            vmi = root.streaming__vm_instance.create(service.name)
-            vmi.type = 'csr-small'
-            service.vm_up_and_running=True
-
-    # @NanoService.delete
-    # def cb_nano_delete(self, tctx, root, service, plan, component, state,
-    #                    proplist, component_proplist):
+    @NanoService.delete
+    def cb_nano_delete(self, tctx, root, service, plan, component, state,
+                       proplist, component_proplist):
+        self.log.info('Nano delete(state=', state, ')')        
 
 
 # ---------------------------------------------

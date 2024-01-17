@@ -21,7 +21,7 @@ module streaming {
       "Initial revision.";
   }
 
-  list  dc{
+  list dc {
     key name;  
     leaf name {
       type string;
