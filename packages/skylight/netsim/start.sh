@@ -25,6 +25,8 @@ env sname=${NAME} ${CONFD} -c confd.conf ${CONFD_FLAGS} \
     --addloadpath ${CONFD_DIR}/etc/confd
 ret=$?
 
+NCS_IPC_PORT=$CONFD_IPC_PORT python3 skylight.py&
+
 if [ ! $first_time = 0 ]; then
    true;
    ## If there is anything we want to do after the

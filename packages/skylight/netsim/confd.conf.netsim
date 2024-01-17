@@ -1,7 +1,7 @@
 <confdConfig xmlns="http://tail-f.com/ns/confd_cfg/1.0">
   <confdIpcAddress>
     <ip>127.0.0.1</ip>
-    <port>%IPC_PORT%</port>
+    <port>5018</port>
   </confdIpcAddress>
   <loadPath>
     <dir>.</dir>
@@ -126,7 +126,7 @@
       <ssh>
         <enabled>true</enabled>
         <ip>0.0.0.0</ip>
-        <port>%NETCONF_SSH_PORT%</port>
+        <port>12030</port>
       </ssh>
       <tcp>
         <enabled>false</enabled>
@@ -148,21 +148,24 @@
       <rollback-on-error>
         <enabled>true</enabled>
       </rollback-on-error>
+      <notification>
+        <enabled>true</enabled>
+      </notification>
       <actions>
         <enabled>true</enabled>
       </actions>
     </capabilities>
   </netconf>
   <cli>
-    <prompt1>\u@%NAME%></prompt1>
-    <prompt2>\u@%NAME%%</prompt2>
-    <cPrompt1>%NAME%#</cPrompt1>
-    <cPrompt2>%NAME%(\m)#</cPrompt2>
+    <prompt1>\u@skylight></prompt1>
+    <prompt2>\u@skylight%</prompt2>
+    <cPrompt1>skylight#</cPrompt1>
+    <cPrompt2>skylight(\m)#</cPrompt2>
 
     <enabled>true</enabled>
     <ssh>
       <enabled>true</enabled>
-      <port>%CLI_SSH_PORT%</port>
+      <port>10030</port>
     </ssh>
     <spaceCompletion>
       <enabled>false</enabled>
@@ -174,4 +177,13 @@
     <wrapInfo>true</wrapInfo>
     <showKeyName>false</showKeyName>
   </cli>
+  <notifications>
+    <eventStreams>
+      <stream>
+        <name>skylight-events</name>
+        <description>Skylight event stream</description>
+        <replaySupport>false</replaySupport>
+      </stream>
+    </eventStreams>
+  </notifications>
 </confdConfig>
