@@ -3,12 +3,12 @@
     <name>dc0</name>
     <fw>edge0</fw>
     <media-origin>origin0</media-origin>
-    <skylight>skylight0</skylight>
+    <skylight>skylight</skylight>
   </dc>
   <dc xmlns="http://com/example/basic-streaming/streaming">
     <name>dc1</name>
     <fw>edge1</fw>
     <media-origin>origin1</media-origin>
-    <skylight>skylight1</skylight>
+    <skylight>skylight</skylight>
   </dc>
 </config>

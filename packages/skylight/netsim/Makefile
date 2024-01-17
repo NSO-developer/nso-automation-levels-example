@@ -6,7 +6,7 @@ include $(NCS_DIR)/src/ncs/build/include.netsim.mk
 XML = $(wildcard *.xml)
 XML += $(NCS_DIR)/netsim/confd/var/confd/cdb/aaa_init.xml
 
-EXTRA_FILES = confd.conf.netsim
+EXTRA_FILES = confd.conf.netsim agents.xml
 
 YANG = $(wildcard ../src/yang/*.yang)
 SUBMODULES          = $(shell grep -l belongs-to ../src/yang/*.yang \
