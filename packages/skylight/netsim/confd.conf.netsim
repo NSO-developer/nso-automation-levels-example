@@ -1,7 +1,7 @@
 <confdConfig xmlns="http://tail-f.com/ns/confd_cfg/1.0">
   <confdIpcAddress>
     <ip>127.0.0.1</ip>
-    <port>5018</port>
+    <port>%IPC_PORT%</port>
   </confdIpcAddress>
   <loadPath>
     <dir>.</dir>
@@ -126,7 +126,7 @@
       <ssh>
         <enabled>true</enabled>
         <ip>0.0.0.0</ip>
-        <port>12030</port>
+        <port>%NETCONF_SSH_PORT%</port>
       </ssh>
       <tcp>
         <enabled>false</enabled>
@@ -157,15 +157,15 @@
     </capabilities>
   </netconf>
   <cli>
-    <prompt1>\u@skylight></prompt1>
-    <prompt2>\u@skylight%</prompt2>
-    <cPrompt1>skylight#</cPrompt1>
-    <cPrompt2>skylight(\m)#</cPrompt2>
+    <prompt1>\u@%NAME%></prompt1>
+    <prompt2>\u@%NAME%%</prompt2>
+    <cPrompt1>%NAME%#</cPrompt1>
+    <cPrompt2>%NAME%(\m)#</cPrompt2>
 
     <enabled>true</enabled>
     <ssh>
       <enabled>true</enabled>
-      <port>10030</port>
+      <port>%CLI_SSH_PORT%</port>
     </ssh>
     <spaceCompletion>
       <enabled>false</enabled>
