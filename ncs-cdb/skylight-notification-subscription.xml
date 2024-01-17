@@ -1,0 +1,15 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device>
+      <name>skylight</name>
+      <notifications>
+        <subscription>
+          <name>skylight-events</name>
+          <stream>skylight-events</stream>
+          <local-user>admin</local-user>
+          <reconnect-interval>10</reconnect-interval>
+        </subscription>
+      </notifications>
+    </device>
+  </devices>
+</config>

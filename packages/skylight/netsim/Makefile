@@ -8,8 +8,7 @@ XML += $(NCS_DIR)/netsim/confd/var/confd/cdb/aaa_init.xml
 
 EXTRA_FILES = confd.conf.netsim agents.xml skylight.py skylight_netsim_ns.py
 
-YANG = $(wildcard ../src/yang/*.yang) \
-       skylight-netsim.yang
+YANG = $(wildcard ../src/yang/*.yang)
 SUBMODULES          = $(shell grep -l belongs-to ../src/yang/*.yang \
                         | xargs grep -l submodule)
 ANNOTATION_MODULES  = $(wildcard ../src/yang/*-ann.yang)
@@ -20,8 +19,7 @@ BUILTIN_FXS = $(subst $(NCS_DIR)/netsim/confd/etc/confd/,, \
 BUILTIN_FXS += ietf-netconf.fxs ietf-netconf-with-defaults.fxs
 
 FXS = $(filter-out $(BUILTIN_FXS), \
-	$(YANG_MODULES:../src/yang/%.yang=%.fxs)) \
-	skylight-netsim.fxs
+	$(YANG_MODULES:../src/yang/%.yang=%.fxs))
 
 FLAGS = --yangpath ../src/yang
 
