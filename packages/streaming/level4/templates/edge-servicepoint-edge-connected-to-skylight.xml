@@ -29,4 +29,13 @@
       </config>
     </device>
   </devices>
+  <kickers xmlns="http://tail-f.com/ns/kicker">
+      <notification-kicker xmlns="http://tail-f.com/ns/ncs-kicker">
+          <id>skylight-notification-kicker</id>
+          <serializer>111</serializer>
+          <selector-expr>$SUBSCRIPTION_NAME='skylight-events'</selector-expr>
+          <kick-node xmlns:streaming="http://com/example/basic-streaming/streaming">/streaming:actions</kick-node>
+          <action-name>skylight-notification</action-name>
+      </notification-kicker>
+  </kickers>
 </config-template>

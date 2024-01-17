@@ -11,7 +11,9 @@ module streaming {
   import tailf-common {
     prefix tailf;
   }
-
+  import tailf-kicker {
+    prefix kicker;
+  }
 
   description
      "";
@@ -178,6 +180,17 @@ module streaming {
           }
         }
         ncs:component-type-ref "streaming:edge";
+      }
+    }
+  }
+
+  container actions {
+    tailf:action skylight-notification {
+      tailf:actionpoint skylight-notification;
+      input {
+        uses kicker:action-input-params;
+      }
+      output {
       }
     }
   }
