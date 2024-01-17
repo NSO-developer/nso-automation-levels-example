@@ -70,8 +70,8 @@ class NotificationDaemon:
                            _ncs.C_XMLBEGIN)
                      ),
             tagvalue(xmltag(ns.hash,
-                            ns.skylight_netsim_random),
-                     value(random.randint(1, 1000000), _ncs.C_UINT32)),
+                            ns.skylight_netsim_jitter),
+                     value((random.randint(1000, 3000), 3), _ncs.C_DECIMAL64)),
 
             tagvalue(xmltag(ns.hash,
                             ns.skylight_netsim_skylight_event),

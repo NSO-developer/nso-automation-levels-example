@@ -29,8 +29,11 @@ module skylight-netsim {
   notification skylight-event {
     description
       "Event emitted from the Skylight Netsim device.";
-    leaf random {
-      type uint32;
+    leaf jitter {
+      type decimal64 {
+        fraction-digits 3;
+      }
+      units "ms";
     }
   }
 }
