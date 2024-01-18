@@ -1,1 +1,1 @@
-pkill -f python3 skylight.py
+pkill -f skylight.py
