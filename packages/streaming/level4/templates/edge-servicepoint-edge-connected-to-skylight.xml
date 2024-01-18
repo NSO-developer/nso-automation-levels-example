@@ -3,6 +3,8 @@
                  componenttype="streaming:edge"
                  state="streaming:connected-to-skylight">
   <?set EDGE = {./name}?>
+  <?set SESSION_ID = 1234?>
+  <?set DC = 0?>
   <?set-root-node {/}?>
   <devices xmlns="http://tail-f.com/ns/ncs">
     <device>

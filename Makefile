@@ -4,8 +4,13 @@ build: build-packages netsim
 
 start: start-netsims start-nso start-cli
 
-build-packages:
-	@for p in packages/*; do echo "\n#### Building $$p"; make -C $$p/src || exit; done
+build-packages: build-services
+
+build-neds: 
+	@for p in `grep -l ned-id packages/*/src/package-meta-data.xml.in`; do n=`dirname $$p`; echo "\n#### Building NED `dirname $$n`"; make -C $$n || exit; done
+
+build-services: build-neds 
+	@for n in packages/streaming; do echo "\n#### Building Service $$n"; make -C $$n/src || exit; done
 
 netsim:
 	@echo "\n#### Building netsim network"

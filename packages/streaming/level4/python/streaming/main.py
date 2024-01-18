@@ -13,12 +13,12 @@ from ncs.dp import Action
 
 import traceback
 
-
-class SkylightNotificationAction(Action):
+class SkylightNotificationAction(ncs.dp.Action):
     @Action.action
-    def do_action(self, t, input):
+    def cb_action(self, uinfo, name, kp, input, output, trans):
+        #def cb_action(self, t, input):
         try:
-            root = ncs.maagic.get_root(t)
+            root = ncs.maagic.get_root(trans)
             notification = root._get_node(input.path)
 
             self.log.info(f'Got notification type {notification}')

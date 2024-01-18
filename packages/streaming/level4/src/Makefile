@@ -7,6 +7,8 @@ include $(NCS_DIR)/src/ncs/build/include.ncs.mk
 SRC = $(wildcard yang/*.yang)
 DIRS = ../load-dir java/src/$(JDIR)/$(NS)
 FXS = $(SRC:yang/%.yang=../load-dir/%.fxs)
+# Allow including the NSO mounted (devices/device/...) skylight YANG files
+YANGPATH = ../../../skylight/src/ncsc-out/modules/yang/
 
 NCSCPATH   = $(YANGPATH:%=--yangpath %)
 YANGERPATH = $(YANGPATH:%=--path %)

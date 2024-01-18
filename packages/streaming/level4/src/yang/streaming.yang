@@ -54,7 +54,7 @@ module streaming {
       type string;
       tailf:non-strict-leafref {
         path "/ncs:devices/ncs:device/ncs:config/accgwo:accedian-components" +
-             "/accgo:sensor-agent/accgo:agents/accgo:agent/accgo:agentId";
+             "/accgwo:sensor-agent/accgwo:agents/accgwo:agent/accgwo:agentId";
       }
     }
 
