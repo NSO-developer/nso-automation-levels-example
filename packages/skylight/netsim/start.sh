@@ -21,7 +21,8 @@
 test -f  cdb/O.cdb
 first_time=$?
 
-env sname=${NAME} ${CONFD} -c confd.conf ${CONFD_FLAGS} \
+ln -sf confd.conf ${NAME}.conf
+env sname=${NAME} ${CONFD} -c ${NAME}.conf ${CONFD_FLAGS} \
     --addloadpath ${CONFD_DIR}/etc/confd
 ret=$?
 
