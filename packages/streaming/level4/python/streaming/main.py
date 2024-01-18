@@ -41,9 +41,8 @@ class ConnectedToSkylight(NanoService):
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)
 
 class SkylightNotificationAction(ncs.dp.Action):
-    #def cb_action(self, uinfo, name, kp, input, output, trans):
     @Action.action
-    def cb_action(self, t, input):
+    def cb_action(self, uinfo, name, kp, input, output, trans):
         try:
             root = ncs.maagic.get_root(trans)
             notification = root._get_node(input.path)
