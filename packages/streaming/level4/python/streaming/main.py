@@ -14,25 +14,8 @@ from ncs.dp import Action
 import traceback
 
 
-class NotifAction(Action):
+class SkylightNotificationAction(Action):
     @Action.action
-    def cb_action(self, uinfo, name, kp, input, output, trans):
-        self.log.info(f'path={input.path}')
-        if hasattr(Maapi, "run_with_retry"):
-            def wrapped_do_action(trans):
-                return self.do_action(trans, input)
-            with ncs.maapi.Maapi() as m:
-                with ncs.maapi.Session(m, 'admin', 'system'):
-                    m.run_with_retry(wrapped_do_action)
-        else:
-            with ncs.maapi.single_write_trans('admin', 'system') as t:
-                self.do_action(t, input)
-                t.apply()
-    def do_action(self, t, input):
-        pass
-
-
-class SkylightNotificationAction(NotifAction):
     def do_action(self, t, input):
         try:
             root = ncs.maagic.get_root(t)
