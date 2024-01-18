@@ -48,14 +48,18 @@ module streaming {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
+      must "starts-with(deref(.)/../ncs:device-type/ncs:netconf/ncs:ned-id, 'skylight')" {
+        error-message "Only the name of a skylight device makes sense here.";
+      }
     }
 
     leaf skylight-agent-id {
       type string;
-      tailf:non-strict-leafref {
-        path "/ncs:devices/ncs:device/ncs:config/accgwo:accedian-components" +
-             "/accgo:sensor-agent/accgo:agents/accgo:agent/accgo:agentId";
-      }
+      // tailf:non-strict-leafref {
+      //   path "/ncs:devices/ncs:device/ncs:config/accgwo:accedian-components" +
+      //        "/sensor-agent/agents/agent/agentId";
+      // }
+
     }
 
     container oper-status {

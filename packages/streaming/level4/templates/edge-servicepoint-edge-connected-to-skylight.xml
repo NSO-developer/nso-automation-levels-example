@@ -1,7 +1,4 @@
-<config-template xmlns="http://tail-f.com/ns/config/1.0"
-                 servicepoint="edge-servicepoint"
-                 componenttype="streaming:edge"
-                 state="streaming:connected-to-skylight">
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
   <?set EDGE = {./name}?>
   <?set-root-node {/}?>
   <devices xmlns="http://tail-f.com/ns/ncs">
@@ -15,7 +12,7 @@
             <sessiontype>twamp</sessiontype>
             <ifStateful>true</ifStateful>
             <agent>
-                <agentId>{/ncs:devices/ncs:device[ncs:name=/streaming:dc[streaming:name=$DC]]/streaming:skylight-agent-id}</agentId>
+              <agentId>{/streaming:dc[streaming:name=$DC]/streaming:skylight-agent-id}</agentId>
               <agentSessionName>{$DC}-agent-to-{$EDGE}-twamp</agentSessionName>
               <enable>true</enable>
               <period>continuous</period>
@@ -32,12 +29,12 @@
     </device>
   </devices>
   <kickers xmlns="http://tail-f.com/ns/kicker">
-      <notification-kicker xmlns="http://tail-f.com/ns/ncs-kicker">
-          <id>skylight-notification-kicker</id>
-          <serializer>111</serializer>
-          <selector-expr>$SUBSCRIPTION_NAME='skylight-events'</selector-expr>
-          <kick-node xmlns:streaming="http://com/example/basic-streaming/streaming">/streaming:actions</kick-node>
-          <action-name>skylight-notification</action-name>
-      </notification-kicker>
+    <notification-kicker xmlns="http://tail-f.com/ns/ncs-kicker">
+      <id>skylight-notification-kicker</id>
+      <serializer>111</serializer>
+      <selector-expr>$SUBSCRIPTION_NAME='skylight-events'</selector-expr>
+      <kick-node xmlns:streaming="http://com/example/basic-streaming/streaming">/streaming:actions</kick-node>
+      <action-name>skylight-notification</action-name>
+    </notification-kicker>
   </kickers>
 </config-template>
