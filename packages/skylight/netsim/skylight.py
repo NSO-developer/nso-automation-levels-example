@@ -62,7 +62,7 @@ class NotificationDaemon:
     def join(self):
         self.ndaemon.join()
 
-    def send(self):
+    def send(self, jitter):
         values = [
             tagvalue(xmltag(ns.hash,
                             ns.skylight_netsim_skylight_event),
@@ -71,7 +71,7 @@ class NotificationDaemon:
                      ),
             tagvalue(xmltag(ns.hash,
                             ns.skylight_netsim_jitter),
-                     value((random.randint(1000, 3000), 3), _ncs.C_DECIMAL64)),
+                     value((jitter, 3), _ncs.C_DECIMAL64)),
 
             tagvalue(xmltag(ns.hash,
                             ns.skylight_netsim_skylight_event),
@@ -83,10 +83,16 @@ class NotificationDaemon:
 
 
 class SendNotificationAction(Action):
+    # FIXME @Action.rpc
     @Action.action
     def cb_action(self, uinfo, name, kp, input, output):
+        if name == "send-notification-high-jitter":
+            jitter = random.randint(5000, 8000)
+        else:
+            jitter = random.randint(1000, 3000)
+
         if notif_daemon is not None:
-            notif_daemon.send()
+            notif_daemon.send(jitter)
             self.log.info("Notification sent")
 
 
