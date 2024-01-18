@@ -15,13 +15,11 @@ module skylight-netsim {
       "Inital version.";
   }
 
-  container skylight-netsim {
-    tailf:action send-notification-high-jitter {
-      tailf:actionpoint "skylight-send-notification";
-    }
-    tailf:action send-notification-low-jitter {
-      tailf:actionpoint "skylight-send-notification";
-    }
+  rpc send-notification-high-jitter {
+    tailf:actionpoint "skylight-send-notification";
+  }
+  rpc send-notification-low-jitter {
+    tailf:actionpoint "skylight-send-notification";
   }
 
 
