@@ -2,25 +2,27 @@
                  servicepoint="edge-servicepoint"
                  componenttype="streaming:edge"
                  state="streaming:connected-to-skylight">
+  <?set EDGE = {./name}?>
+  <?set-root-node {/}?>
   <devices xmlns="http://tail-f.com/ns/ncs">
     <device>
       <name>skylight</name>
       <config>
         <sessions xmlns="urn:accedian:params:xml:ns:yang:accedian-gateway-orchestrator">
           <session>
-            <sessionIdentifier>94d26a7f-a2d0-43dc-8839-39853c70f84f</sessionIdentifier>
+            <sessionIdentifier>{$SESSION_ID}</sessionIdentifier>
             <orchestratorType>agent</orchestratorType>
             <sessiontype>twamp</sessiontype>
             <ifStateful>true</ifStateful>
             <agent>
-              <agentId>a31e3e45-ec69-4f4a-a479-b2273f8077be</agentId>
-              <agentSessionName>dc0-agent-to-edge0-twamp</agentSessionName>
+                <agentId>{/ncs:devices/ncs:device[ncs:name=/streaming:dc[streaming:name=$DC]]/streaming:skylight-agent-id}</agentId>
+              <agentSessionName>{$DC}-agent-to-{$EDGE}-twamp</agentSessionName>
               <enable>true</enable>
               <period>continuous</period>
             </agent>
             <twamp>
               <senderDscp>0</senderDscp>
-              <reflectorAddr>10.58.244.222</reflectorAddr>
+              <reflectorAddr>{/ncs:devices/ncs:device[ncs:name=$EDGE]/ncs:address}</reflectorAddr>
               <reflectorPort>4000</reflectorPort>
               <reportInterval>31</reportInterval>
             </twamp>
