@@ -20,10 +20,23 @@ class ConnectedToSkylight(NanoService):
     def cb_nano_create(self, tctx, root, service, plan, component, state, proplist, compproplist):
         self.log.info(f'cb_nano_create: ConnectedToSkylight')
         vars = ncs.template.Variables()
+        # Create a unique session ID from the service name
         vars.add('SESSION_ID', str(uuid.uuid5(uuid.NAMESPACE_DNS,
                  f'{service.name}-edge-connected-to-skylight')))
-        # TODO: Add the correct DC name
-        vars.add('DC', "dc0")
+        # Find the DC with the lowest jitter
+        jitter = 100000
+        dc = None
+        for n in root.dc:
+            self.log.info(
+                f'Checking DC {n.name} jitter {n.oper_status.jitter}')
+            if n.oper_status.jitter is not None and n.oper_status.jitter < jitter:
+                jitter = n.oper_status.jitter
+                dc = n.name
+        if dc is None:
+            raise Exception('No DC found')
+        self.log.info(f'Found DC {dc} with the lowest jitter {jitter}')
+        vars.add('DC', dc)
+        # Apply the template
         template = ncs.template.Template(service)
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)
 
