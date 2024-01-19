@@ -8,6 +8,12 @@ module streaming {
   import tailf-ncs {
     prefix ncs;
   }
+  import tailf-common {
+    prefix tailf;
+  }
+  import accedian-gateway-orchestrator {
+    prefix accgwo;
+  }
 
   description
      "";
@@ -17,7 +23,7 @@ module streaming {
       "Initial revision.";
   }
 
-  list  dc{
+  list dc {
     key name;  
     leaf name {
       type string;
@@ -38,6 +44,14 @@ module streaming {
     leaf skylight {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+
+    leaf skylight-agent-id {
+      type string;
+      tailf:non-strict-leafref {
+        path "/ncs:devices/ncs:device/ncs:config/accgwo:accedian-components" +
+             "/accgwo:sensor-agent/accgwo:agents/accgwo:agent/accgwo:agentId";
       }
     }
 
