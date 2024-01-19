@@ -17,16 +17,36 @@ module skylight-netsim {
 
   rpc send-notification-high-jitter {
     tailf:actionpoint "skylight-send-notification";
+    input {
+      leaf device {
+        description "Name of the device this notification pertains to.";
+        mandatory true;
+        type string;
+      }
+    }
   }
   rpc send-notification-low-jitter {
     tailf:actionpoint "skylight-send-notification";
+    input {
+      leaf device {
+        description "Name of the device this notification pertains to.";
+        mandatory true;
+        type string;
+      }
+    }
   }
-
 
   notification skylight-event {
     description
       "Event emitted from the Skylight Netsim device.";
+    leaf device {
+      description "Name of the device this notification pertains to.";
+      mandatory true;
+      type string;
+    }
     leaf jitter {
+      description "Jitter observed pertaining to the device.";
+      mandatory true;
       type decimal64 {
         fraction-digits 3;
       }

@@ -24,18 +24,22 @@ class ConnectedToSkylight(NanoService):
         vars.add('SESSION_ID', str(uuid.uuid5(uuid.NAMESPACE_DNS,
                  f'{service.name}-edge-connected-to-skylight')))
         # Find the DC with the lowest jitter
-        jitter = 100000
-        dc = None
+        best_jitter = 100000
+        best_dc = None
         for n in root.dc:
+            if n.oper_status.jitter is None:
+                continue
+            dc_jitter = float(n.oper_status.jitter)
             self.log.info(
-                f'Checking DC {n.name} jitter {n.oper_status.jitter}')
-            if n.oper_status.jitter is not None and n.oper_status.jitter < jitter:
-                jitter = n.oper_status.jitter
-                dc = n.name
-        if dc is None:
+                f'Checking DC {n.name} jitter {dc_jitter}')
+            if dc_jitter < best_jitter:
+                best_jitter = dc_jitter
+                best_dc = n.name
+        if best_dc is None:
             raise Exception('No DC found')
-        self.log.info(f'Found DC {dc} with the lowest jitter {jitter}')
-        vars.add('DC', dc)
+        self.log.info(f'Found DC {best_dc} with the lowest jitter {best_jitter}')
+        vars.add('DC', best_dc)
+        service.oper_status.chosen_dc = best_dc
         # Apply the template
         template = ncs.template.Template(service)
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)
@@ -47,11 +51,10 @@ class SkylightNotificationAction(ncs.dp.Action):
             root = ncs.maagic.get_root(trans)
             notification = root._get_node(input.path)
 
-            self.log.info(f'Got notification type {notification} {notification.jitter}')
+            self.log.info(f'Got notification type {notification} {notification.device} {notification.jitter}')
             with single_write_trans('admin', 'system', db=ncs.OPERATIONAL) as t:
                 r = ncs.maagic.get_root(t)
-                #root.streaming_dc[notification.dc].oper_status.jitter = notification.jitter
-                r.streaming__dc['dc0'].oper_status.jitter = notification.jitter
+                r.streaming__dc[notification.device].oper_status.jitter = notification.jitter
                 t.apply()
             return True
 

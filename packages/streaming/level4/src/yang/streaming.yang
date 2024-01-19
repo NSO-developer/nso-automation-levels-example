@@ -94,6 +94,18 @@ module streaming {
         error-message "Only the name of an edge device makes sense here.";
       }
     }
+    container oper-status {
+      config false;
+      tailf:info "The actual operational state of the service.";
+      tailf:cdb-oper  {
+        tailf:persistent true;
+      }
+      leaf chosen-dc {
+        type leafref {
+          path "/dc/name";
+        }
+      }
+    }
   }
 
   identity dc {
@@ -177,16 +189,7 @@ module streaming {
       ncs:create-component "'self'" {
         ncs:component-type-ref "ncs:self";
       }
-      ncs:variable "DC" {
-        // Choose the DC with the lowest jitter
-        ncs:value-expr "(/streaming:dc[./oper-status/jitter=min(/streaming:dc/oper-status/jitter)]/name)[1]";
-      }
-      ncs:create-component "$DC" {
-        ncs:observe {
-          ncs:monitor "/streaming:dc[name=$DC]/oper-status/jitter" {
-            ncs:trigger-expr "current()>100";
-          }
-        }
+      ncs:create-component "'dc'" {
         ncs:component-type-ref "streaming:dc";
       }
       ncs:create-component "'edge'" {
