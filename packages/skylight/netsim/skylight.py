@@ -89,7 +89,9 @@ class NotificationDaemon:
 class SendNotificationAction(Action):
     @Action.rpc
     def cb_action(self, uinfo, name, input, output):
-        if name == "send-notification-high-jitter":
+        if input.jitter:
+            jitter = int(float(input.jitter)*1000)
+        elif name == "send-notification-high-jitter":
             jitter = random.randint(5000, 8000)
         else:
             jitter = random.randint(1000, 3000)
