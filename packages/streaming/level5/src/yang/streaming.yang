@@ -11,7 +11,12 @@ module streaming {
   import tailf-common {
     prefix tailf;
   }
-
+  import tailf-kicker {
+    prefix kicker;
+  }
+  import accedian-gateway-orchestrator {
+    prefix accgwo;
+  }
 
   description
      "";
@@ -43,6 +48,21 @@ module streaming {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
+      must "starts-with(deref(.)/../ncs:device-type/ncs:netconf/ncs:ned-id, 'skylight')" {
+        error-message "Only the name of a skylight device makes sense here.";
+      }
+    }
+
+    leaf skylight-agent-id {
+      type string;
+      tailf:non-strict-leafref {
+        path "/ncs:devices/ncs:device/ncs:config/accgwo:accedian-components" +
+             "/accgwo:sensor-agent/accgwo:agents/accgwo:agent/accgwo:agentId";
+      }
+    }
+    leaf edge-capacity {
+      type uint32;
+      default 3;
     }
 
     container oper-status {
@@ -52,10 +72,19 @@ module streaming {
         tailf:persistent true;
       }
       leaf jitter {
-        type uint32;
+        type decimal64 {
+          fraction-digits 3;
+        }
+        units "ms";
       }
       leaf energy-price {
         type uint32;
+        units USD/MWh;
+      }
+      leaf-list edge-clients {
+        type leafref {
+          path /edge/name;
+        }
       }
     }
   }
@@ -78,6 +107,19 @@ module streaming {
         error-message "Only the name of an edge device makes sense here.";
       }
     }
+    container oper-status {
+      config false;
+      tailf:info "The actual operational state of the service.";
+      tailf:cdb-oper  {
+        tailf:persistent true;
+      }
+      leaf chosen-dc {
+        type leafref {
+          path "/dc/name";
+        }
+      }
+    }
+    // FIXME janl remove this, no longer needed
     leaf optimize-for {
       type enumeration {
         enum jitter {
@@ -153,12 +195,13 @@ module streaming {
       ncs:state "streaming:connected-to-dc" {
         ncs:create {
           ncs:nano-callback;
-          ncs:post-action-node
-              "/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]" +
-              "/rpc/rpc-load-from-storage" {
-            ncs:action-name "load-from-storage";
-            ncs:result-expr "result = 'true'";
-          }
+          // FIXME janl removed this for now
+          //ncs:post-action-node
+          //    "/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]" +
+          //    "/rpc/rpc-load-from-storage" {
+          //  ncs:action-name "load-from-storage";
+          //  ncs:result-expr "result = 'true'";
+          //}
         }
       }
       ncs:state "streaming:connected-to-skylight" {
@@ -178,15 +221,7 @@ module streaming {
       ncs:create-component "'self'" {
         ncs:component-type-ref "ncs:self";
       }
-      ncs:variable "DC" {
-        // Choose the DC with the lowest jitter or with the lowest energy price
-        ncs:value-expr "concat(/streaming:dc[./oper-status/jitter=min(/streaming:dc/oper-status/jitter) and $SERVICE/optimize-for='jitter']/name,
-                               /streaming:dc[./oper-status/energy-price=min(/streaming:dc/oper-status/energy-price) and $SERVICE/optimize-for='energy-price']/name)";
-      }
-      ncs:create-component "$DC" {
-        ncs:observe {
-          ncs:monitor "/streaming:dc/oper-status";
-        }
+      ncs:create-component "'dc'" {
         ncs:component-type-ref "streaming:dc";
       }
       ncs:create-component "'edge'" {
@@ -197,6 +232,36 @@ module streaming {
           }
         }
         ncs:component-type-ref "streaming:edge";
+      }
+    }
+  }
+
+  container actions {
+    tailf:action skylight-notification {
+      tailf:actionpoint skylight-notification;
+      input {
+        uses kicker:action-input-params;
+      }
+      output {
+      }
+    }
+    tailf:action optimize {
+      tailf:actionpoint optimize;
+      input {
+        leaf iterations {
+          type uint32;
+          default 10;
+        }
+      }
+    }
+    container oper-status {
+      config false;
+      tailf:info "The actual operational state of the service.";
+      tailf:cdb-oper  {
+        tailf:persistent true;
+      }
+      leaf optimization-iterations {
+        type uint32;
       }
     }
   }

@@ -3,6 +3,7 @@
                  componenttype="streaming:edge"
                  state="streaming:connected-to-dc">
 <?set EDGE = {./name}?>
+<?set DC = {./oper-status/chosen-dc}?>
 <?set-root-node {/}?>
 <devices xmlns="http://tail-f.com/ns/ncs">
    <device>
