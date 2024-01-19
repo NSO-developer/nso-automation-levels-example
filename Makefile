@@ -17,8 +17,7 @@ netsim:
 	@if [ ! -d netsim ]; then                              \
 		ncs-netsim                                           \
 			create-network packages/origin     2 origin        \
-			create-network packages/subscriber 2 subscriber    \
-			create-network packages/edge       2 edge;         \
+			create-network packages/edge       4 edge;         \
 		ncs-netsim add-device packages/skylight skylight;    \
 		ncs-netsim ncs-xml-init > ncs-cdb/netsim-init.xml;   \
 	else echo "\n#### Netsim network already created";     \

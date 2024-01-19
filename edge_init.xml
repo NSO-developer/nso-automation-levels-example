@@ -35,5 +35,43 @@
         </edge>
       </config>
     </device>
+    <device>
+      <name>edge2</name>
+      <config>
+        <edge xmlns="http://tail-f.com/ns/cleu24/tecops-2665/edge">
+          <content>
+            <content-id>Don't Look Up</content-id>
+          </content>
+          <content>
+            <content-id>Ghostbusters</content-id>
+          </content>
+          <content>
+            <content-id>The Matrix</content-id>
+          </content>
+          <content>
+            <content-id>Terminator 2: Judgement Day</content-id>
+          </content>
+        </edge>
+      </config>
+    </device>
+    <device>
+      <name>edge3</name>
+      <config>
+        <edge xmlns="http://tail-f.com/ns/cleu24/tecops-2665/edge">
+          <content>
+            <content-id>The Matrix</content-id>
+          </content>
+          <content>
+            <content-id>Terminator 2: Judgement Day</content-id>
+          </content>
+          <content>
+            <content-id>Some Like it Hot</content-id>
+          </content>
+          <content>
+            <content-id>Apollo 13</content-id>
+          </content>
+        </edge>
+      </config>
+    </device>
   </devices>
 </config>
