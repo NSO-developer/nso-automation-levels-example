@@ -1,5 +1,15 @@
-<config-template xmlns="http://tail-f.com/ns/config/1.0"
-                 servicepoint="edge-servicepoint"
-                 componenttype="streaming:dc"
-                 state="streaming:skylight-configured">
+<config-template xmlns="http://tail-f.com/ns/config/1.0" servicepoint="edge-servicepoint" componenttype="streaming:dc" state="streaming:skylight-configured">
+    <?set DC = {./name}?>
+    <devices xmlns="http://tail-f.com/ns/ncs">
+        <device>
+            <name>{$DC}</name>
+            <config>
+                <twamp xmlns="urn:ietf:params:xml:ns:yang:ietf-twamp">
+                    <session-reflector>
+                        <admin-state>true</admin-state>
+                    </session-reflector>
+                </twamp>
+            </config>
+        </device>
+    </devices>
 </config-template>
