@@ -68,7 +68,10 @@ module streaming {
         tailf:persistent true;
       }
       leaf jitter {
-        type uint32;
+        type decimal64 {
+          fraction-digits 3;
+        }
+        units "ms";
       }
     }
   }
