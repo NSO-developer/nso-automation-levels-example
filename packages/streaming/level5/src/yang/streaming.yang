@@ -132,10 +132,9 @@ module streaming {
     }
     action optimize {
       tailf:actionpoint optimize;
-      input {
-        leaf iterations {
-          type uint32;
-          default 10;
+      output {
+        leaf result { 
+          type string; 
         }
       }
     }
@@ -147,15 +146,10 @@ module streaming {
           default 10;
         }
       }
-    }
-    container oper-status {
-      config false;
-      tailf:info "The actual operational state of the service.";
-      tailf:cdb-oper  {
-        tailf:persistent true;
-      }
-      leaf optimization-iterations {
-        type uint32;
+      output {
+        leaf result { 
+          type string; 
+        }
       }
     }
   }
