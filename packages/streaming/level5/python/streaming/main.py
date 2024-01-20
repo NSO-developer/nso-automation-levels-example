@@ -10,7 +10,7 @@ import ncs
 from ncs.application import NanoService
 from ncs.maapi import Maapi, single_write_trans
 from ncs.dp import Action
-import uuid, time, traceback, threading, math
+import uuid, time, traceback, threading, math, random
 
 class ConnectedToSkylight(NanoService):
     JITTER_WEIGHT = 1
@@ -111,6 +111,55 @@ class StreamerOptimizeAction(ncs.dp.Action):
             self.log.error(traceback.format_exc())
             return False
 
+class StreamerVaryEnergyPriceAction(ncs.dp.Action):
+    energy_price_thread = None
+
+    @Action.action
+    def cb_action(self, uinfo, name, kp, input, output, trans):
+        if StreamerVaryEnergyPriceAction.energy_price_thread:
+            self.log.info(f'Varying Energy Price already running, disregarding')
+        self.log.info(f'Varying Energy price {input.iterations} iterations...')
+        StreamerVaryEnergyPriceAction.energy_price_thread = threading.Thread(target=StreamerVaryEnergyPriceAction.vary, args=(self,input.iterations), daemon=True)
+        StreamerVaryEnergyPriceAction.energy_price_thread.start()
+
+    def vary(self, iterations):
+        try:
+            self.log.info(f'Vary Energy Price thread running...')
+            targets = {}
+            dcs = []
+            while True:
+                if not iterations:
+                    StreamerVaryEnergyPriceAction.energy_price_thread = None
+                    self.log.info(f'Vary Energy Price thread terminating')
+                    return True
+                iterations -= 1
+                with single_write_trans('admin', 'system', db=ncs.OPERATIONAL) as t:
+                    r = ncs.maagic.get_root(t)
+                    if not dcs:
+                        dcs = r.streaming__dc.keys()
+                    dc = r.streaming__dc[dcs.pop(0)]
+                    if dc.name not in targets:
+                        targets[dc.name] = { 'steps': random.choice([1,3,4,5,8]), 
+                                             'value': max(0,int(random.normalvariate(mu=100, sigma=40))) }
+                    curr_price = int(dc.oper_status.energy_price) or 100
+                    curr_steps = targets[dc.name].get('steps',1)
+                    curr_target = targets[dc.name].get('value',100)
+                    if curr_steps <= 1:
+                        new_price = curr_target
+                        del targets[dc.name]
+                    else:
+                        new_price = int(curr_price + (curr_target - curr_price)/curr_steps)
+                        targets[dc.name]['steps'] -= 1
+                    dc.oper_status.energy_price = new_price
+                    t.apply()
+                    self.log.info(f'Vary Energy Price set DC {dc.name} energy price to {new_price}')
+                    time.sleep(15)
+
+        except Exception as e:
+            self.log.error('ERROR: ', e)
+            self.log.error(traceback.format_exc())
+            return False
+
 # ---------------------------------------------
 # COMPONENT THREAD THAT WILL BE STARTED BY NCS.
 # ---------------------------------------------
@@ -136,6 +185,9 @@ class Main(ncs.application.Application):
 
         self.register_action('optimize',
                              StreamerOptimizeAction)
+
+        self.register_action('vary-energy-price',
+                             StreamerVaryEnergyPriceAction)
 
         # When this setup method is finished, all registrations are
         # considered done and the application is 'started'.

@@ -1,4 +1,5 @@
 module streaming {
+  yang-version 1.1;
   namespace "http://com/example/basic-streaming/streaming";
   prefix streaming;
 
@@ -237,16 +238,23 @@ module streaming {
   }
 
   container actions {
-    tailf:action skylight-notification {
+    action skylight-notification {
       tailf:actionpoint skylight-notification;
       input {
         uses kicker:action-input-params;
       }
-      output {
+    }
+    action optimize {
+      tailf:actionpoint optimize;
+      input {
+        leaf iterations {
+          type uint32;
+          default 10;
+        }
       }
     }
-    tailf:action optimize {
-      tailf:actionpoint optimize;
+    action vary-energy-price {
+      tailf:actionpoint vary-energy-price;
       input {
         leaf iterations {
           type uint32;
