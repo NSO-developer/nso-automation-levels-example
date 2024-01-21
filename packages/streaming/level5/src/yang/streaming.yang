@@ -19,16 +19,35 @@ module streaming {
   import accedian-gateway-orchestrator {
     prefix accgwo;
   }
+  import skylight-nc {
+    prefix skylight-nc;
+  }
+  import edge-nc {
+    prefix edge-nc;
+  }
 
-  description
-     "";
+  description "
+    NSO Automation Levels Example
+    (C) 2024 Cisco Systems
+    Permission to use this code as a starting point hereby granted
 
-  revision 2023-11-21 {
+    This module implements an NSO nano service called 'edge' that connects to one
+    datacenter (DC), to deliver a (simulated) video streaming service. The list of
+    datacenters to choose from is also found in this module.
+
+    See the top level README file for more information
+    ";
+
+  revision 2024-01-01 {
     description
       "Initial revision.";
   }
 
+// DC LIST //////////////////////////////////////////////////////////////////////
   list dc {
+    description 
+      "List of available datacenters, and pointers to the devices considered of it";
+
     key name;  
     leaf name {
       type string;
@@ -39,22 +58,20 @@ module streaming {
         path "/ncs:devices/ncs:device/ncs:name";
       }
     }
-
     leaf media-origin {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
     }
-
     leaf skylight {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
-      must "starts-with(deref(.)/../ncs:device-type/ncs:netconf/ncs:ned-id, 'skylight')" {
+      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id, 
+            'skylight-nc:skylight-nc')" {
         error-message "Only the name of a skylight device makes sense here.";
       }
     }
-
     leaf skylight-agent-id {
       type string;
       tailf:non-strict-leafref {
@@ -63,6 +80,7 @@ module streaming {
       }
     }
     leaf edge-capacity {
+      description "The number of edge services this DC can handle.";
       type uint32;
       default 3;
     }
@@ -74,22 +92,27 @@ module streaming {
         tailf:persistent true;
       }
       leaf jitter {
+        description "The latest reported jitter value for this DC.";
         type decimal64 {
           fraction-digits 3;
         }
         units "ms";
       }
       leaf energy-price {
+        description "The latest reported energy-price value for this DC.";
         type uint32;
         units USD/MWh;
       }
       leaf-list edge-clients {
+        description "The edge service instances currently depending on this DC.";
         type leafref {
           path /edge/name;
         }
       }
     }
   }
+
+// EDGE SERVICE /////////////////////////////////////////////////////////////////
 
   list edge {
     key name;
@@ -102,10 +125,8 @@ module streaming {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
-      // Assumes the NED ID for edge devices starts with 'edge'
-      // More formal would be to use the NED identity, but that would require
-      // importing the NED YANG module.
-      must "starts-with(deref(.)/../ncs:device-type/ncs:netconf/ncs:ned-id, 'edge')" {
+      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id, 
+            'edge-nc:edge-nc')" {
         error-message "Only the name of an edge device makes sense here.";
       }
     }
@@ -123,6 +144,7 @@ module streaming {
     }
   }
 
+// ACTIONS //////////////////////////////////////////////////////////////////////
   container actions {
     action skylight-notification {
       tailf:actionpoint skylight-notification;
