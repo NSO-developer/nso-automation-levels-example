@@ -14,7 +14,7 @@ submodule streaming-plan {
     prefix tailf;
   }
 
-    description "
+  description "
     NSO Automation Levels Example
     (C) 2024 Cisco Systems
     Permission to use this code as a starting point hereby granted
