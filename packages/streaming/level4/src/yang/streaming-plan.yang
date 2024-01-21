@@ -1,0 +1,133 @@
+submodule streaming-plan {
+  yang-version 1.1;
+  belongs-to streaming {
+    prefix streaming;
+  }
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+
+    description "
+    NSO Automation Levels Example
+    (C) 2024 Cisco Systems
+    Permission to use this code as a starting point hereby granted
+
+    This submodule implements the NSO nano service plan for the 'edge' service.
+
+    See the top level README file for more information
+    ";
+
+  revision 2024-01-01 {
+    description
+      "Initial revision.";
+  }
+
+// STATES and COMPONENT TYPES ///////////////////////////////////////////////////
+
+  identity dc {
+    base ncs:plan-component-type;
+  }
+  identity skylight-configured {
+    base ncs:plan-state;  
+    description "connect Skylight to NSO";
+  }
+  identity media-origin-monitored {
+    base ncs:plan-state;  
+    description "Add media origin to Skylight";
+  }
+  identity fw-configured {
+    base ncs:plan-state;  
+    description "Add media origin to FW, and allow traffic in to the DC (only if DC is active)";
+  }
+
+  identity edge {
+    base ncs:plan-component-type;
+  }
+  identity connected-to-skylight {
+    base ncs:plan-state;  
+    description "Add edge to Skylight";
+  }
+  identity connected-to-dc {
+    base ncs:plan-state;
+    description "Connect edge to DC (via FW)";
+  }
+
+// PLAN OUTLINE /////////////////////////////////////////////////////////////////
+
+  ncs:plan-outline edge-plan {
+    description "";
+    ncs:self-as-service-status;
+
+    ncs:component-type "ncs:self" {
+      ncs:state "ncs:init";
+      ncs:state "ncs:ready";
+    }
+
+    ncs:component-type "dc" {
+      ncs:state "ncs:init";
+      ncs:state "streaming:skylight-configured" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
+      ncs:state "streaming:media-origin-monitored" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
+      ncs:state "streaming:fw-configured" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
+      ncs:state "ncs:ready";      
+    }
+
+    ncs:component-type "edge" {
+      ncs:state "ncs:init";
+      ncs:state "streaming:connected-to-dc" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
+      ncs:state "streaming:connected-to-skylight" {
+        ncs:create {
+          ncs:nano-callback;
+        }
+      }
+      ncs:state "ncs:ready";      
+    }
+  }
+
+// SERVICE BEHAVIOR TREE ////////////////////////////////////////////////////////
+
+  ncs:service-behavior-tree edge-servicepoint {
+    description "";
+    ncs:plan-outline-ref "streaming:edge-plan";
+
+    ncs:selector {
+      ncs:create-component "'self'" {
+        ncs:component-type-ref "ncs:self";
+      }
+      ncs:create-component "'dc'" {
+        ncs:component-type-ref "streaming:dc";
+      }
+      ncs:create-component "'edge'" {
+        ncs:pre-condition {
+          ncs:monitor
+            "$SERVICE/plan/component[type='streaming:dc']/state[name='ncs:ready']" {
+            ncs:trigger-expr "status = 'reached'";
+          }
+        }
+        ncs:component-type-ref "streaming:edge";
+      }
+    }
+  }
+}

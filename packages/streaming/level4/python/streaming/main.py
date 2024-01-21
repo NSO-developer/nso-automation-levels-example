@@ -1,77 +1,61 @@
-"""NSO Nano service example.
-
-Implements a Nano service callback
-(C) 2023 Cisco Systems
+"""NSO Automation Levels Example
+(C) 2024 Cisco Systems
 Permission to use this code as a starting point hereby granted
 
-See the README file for more information
+This module implements an NSO service creation callback for the connected-to-skylight state.
+At this point in the service creation, the important question is which datacenter (DC) this
+edge service instance should connect to.
+
+There are several factors to consider:
+- How much jitter is measured for each DC
+- What is the energy price at each DC
+- Is there still capacity for more edge services at each DC
+
+This module provides a selection function that takes the above into consideration. It also
+registers this nano-service creation callback with NSO, as well as a few action callbacks
+that are imported.
+
+See the top level README file for more information
 """
 import ncs
 from ncs.application import NanoService
-from ncs.maapi import Maapi, single_write_trans
-from ncs.dp import Action
-
-import traceback
-import uuid
-
+import uuid, math
+from streaming.skylight_notification_action import SkylightNotificationAction
+from streaming.keep_optimizing_action import StreamerOptimizeAction
+from streaming.vary_energy_price_action import StreamerVaryEnergyPriceAction
 
 class ConnectedToSkylight(NanoService):
     @NanoService.create
     def cb_nano_create(self, tctx, root, service, plan, component, state, proplist, compproplist):
-        self.log.info(f'cb_nano_create: ConnectedToSkylight')
+        self.log.info(f'cb_nano_create: ConnectedToSkylight for {service.name}')
         vars = ncs.template.Variables()
+
         # Create a unique session ID from the service name
         vars.add('SESSION_ID', str(uuid.uuid5(uuid.NAMESPACE_DNS,
                  f'{service.name}-edge-connected-to-skylight')))
+
         # Find the DC with the lowest jitter
         best_jitter = 100000
         best_dc = None
-        for n in root.dc:
-            if n.oper_status.jitter is None:
-                continue
-            dc_jitter = float(n.oper_status.jitter)
-            self.log.info(
-                f'Checking DC {n.name} jitter {dc_jitter}')
+        for dc in root.dc:
+            if dc.oper_status.jitter is None:
+                self.log.info(f'Checking DC {dc.name}: DC is not ready')
+                continue # Data not available yet, disregard this option
+            dc_jitter = float(dc.oper_status.jitter)
+            self.log.info(f'Checking DC {dc.name}: jitter {dc_jitter}')
             if dc_jitter < best_jitter:
                 best_jitter = dc_jitter
-                best_dc = n.name
+                best_dc = dc
         if best_dc is None:
             raise Exception('No DC found')
         self.log.info(f'Found DC {best_dc} with the lowest jitter {best_jitter}')
-        vars.add('DC', best_dc)
-        service.oper_status.chosen_dc = best_dc
+        
+        vars.add('DC', best_dc)                         # Value goes into the template applied now
+        service.oper_status.chosen_dc = best_dc.name    # Value goes into operational data, usable
+                                                        # by templates applied at later stages
         # Apply the template
         template = ncs.template.Template(service)
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)
-
-class SkylightNotificationAction(ncs.dp.Action):
-    @Action.action
-    def cb_action(self, uinfo, name, kp, input, output, trans):
-        try:
-            root = ncs.maagic.get_root(trans)
-            notification = root._get_node(input.path)
-
-            self.log.info(f'Got notification type {notification} {notification.device} {notification.jitter}')
-            with single_write_trans('admin', 'system', db=ncs.OPERATIONAL) as t:
-                r = ncs.maagic.get_root(t)
-                r.streaming__dc[notification.device].oper_status.jitter = notification.jitter
-                t.apply()
-
-                # Automatically re-deploy services ... but which ones?
-                # Those that are on the dc in the notification
-                for e in r.streaming__edge:
-                    if e.oper_status.chosen_dc == notification.device:
-                        self.log.info(f'Re-deploying service {e.name}')
-                        e.reactive_re_deploy()
-                    else:
-                        self.log.info(f'Leaving service {e.name} on {e.oper_status.chosen_dc} as is')
-            return True
-
-        except Exception as e:
-            self.log.error('ERROR: ', e)
-            self.log.error(traceback.format_exc())
-            return False
-
 
 # ---------------------------------------------
 # COMPONENT THREAD THAT WILL BE STARTED BY NCS.
@@ -83,6 +67,7 @@ class Main(ncs.application.Application):
         # The application class sets up logging for us. It is accessible
         # through 'self.log' and is a ncs.log.Log instance.
         self.log.info('Main RUNNING')
+
         self.register_nano_service(servicepoint='edge-servicepoint',
                                    componenttype="streaming:edge",
                                    state="streaming:connected-to-skylight",
@@ -91,10 +76,10 @@ class Main(ncs.application.Application):
         # component, and state, as specified in the corresponding data model
         # and plan outline.
 
-        # If we registered any callback(s) above, the Application class
-        # took care of creating a daemon (related to the service/action point).
-        self.register_action('skylight-notification',
-                             SkylightNotificationAction)
+        # We would also like to register a few action callbacks
+        self.register_action('skylight-notification', SkylightNotificationAction)
+        self.register_action('optimize', StreamerOptimizeAction)
+        self.register_action('vary-energy-price', StreamerVaryEnergyPriceAction)
 
         # When this setup method is finished, all registrations are
         # considered done and the application is 'started'.

@@ -1,6 +1,8 @@
 module streaming {
+  yang-version 1.1;
   namespace "http://com/example/basic-streaming/streaming";
   prefix streaming;
+include streaming-plan;
 
   import ietf-inet-types {
     prefix inet;
@@ -17,16 +19,36 @@ module streaming {
   import accedian-gateway-orchestrator {
     prefix accgwo;
   }
+  import skylight-nc {
+    prefix skylight-nc;
+  }
+  import edge-nc {
+    prefix edge-nc;
+  }
 
-  description
-     "";
+  description "
+    NSO Automation Levels Example
+    (C) 2024 Cisco Systems
+    Permission to use this code as a starting point hereby granted
 
-  revision 2023-11-21 {
+    This module implements an NSO nano service called 'edge' that connects to one
+    datacenter (DC), to deliver a (simulated) video streaming service. The list of
+    datacenters to choose from is also found in this module.
+
+    See the top level README file for more information
+    ";
+
+  revision 2024-01-01 {
     description
       "Initial revision.";
   }
 
+// DC LIST //////////////////////////////////////////////////////////////////////
+
   list dc {
+        description 
+      "List of available datacenters, and pointers to the devices part of it";
+
     key name;  
     leaf name {
       type string;
@@ -37,22 +59,20 @@ module streaming {
         path "/ncs:devices/ncs:device/ncs:name";
       }
     }
-
     leaf media-origin {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
     }
-
     leaf skylight {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
-      must "starts-with(deref(.)/../ncs:device-type/ncs:netconf/ncs:ned-id, 'skylight')" {
+      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id, 
+            'skylight-nc:skylight-nc')" {
         error-message "Only the name of a skylight device makes sense here.";
       }
     }
-
     leaf skylight-agent-id {
       type string;
       tailf:non-strict-leafref {
@@ -68,6 +88,7 @@ module streaming {
         tailf:persistent true;
       }
       leaf jitter {
+        description "The latest reported jitter value for this DC.";
         type decimal64 {
           fraction-digits 3;
         }
@@ -75,6 +96,8 @@ module streaming {
       }
     }
   }
+
+// EDGE SERVICE /////////////////////////////////////////////////////////////////
 
   list edge {
     key name;
@@ -87,10 +110,8 @@ module streaming {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
-      // Assumes the NED ID for edge devices starts with 'edge'
-      // More formal would be to use the NED identity, but that would require
-      // importing the NED YANG module.
-      must "starts-with(deref(.)/../ncs:device-type/ncs:netconf/ncs:ned-id, 'edge')" {
+      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id, 
+            'edge-nc:edge-nc')" {
         error-message "Only the name of an edge device makes sense here.";
       }
     }
@@ -108,109 +129,35 @@ module streaming {
     }
   }
 
-  identity dc {
-    base ncs:plan-component-type;
-  }
-
-  identity skylight-configured {
-    base ncs:plan-state;  
-    description "connect Skylight to NSO";
-  }
-  identity media-origin-monitored {
-    base ncs:plan-state;  
-    description "Add media origin to Skylight";
-  }
-  identity fw-configured {
-    base ncs:plan-state;  
-    description "Add media origin to FW, and allow traffic in to the DC (only if DC is active)";
-  }
-  identity edge {
-    base ncs:plan-component-type;
-  }
-  identity connected-to-skylight {
-    base ncs:plan-state;  
-    description "Add edge to Skylight";
-  }
-  identity connected-to-dc {
-    base ncs:plan-state;
-    description "Connect edge to DC (via FW)";
-  }
-
-  ncs:plan-outline edge-plan {
-    description "";
-    ncs:self-as-service-status;
-
-    ncs:component-type "ncs:self" {
-      ncs:state "ncs:init";
-      ncs:state "ncs:ready";
-    }
-
-    ncs:component-type "dc" {
-      ncs:state "ncs:init";
-      ncs:state "streaming:skylight-configured" {
-        ncs:create {
-          ncs:nano-callback;
-        }
-      }
-      ncs:state "streaming:media-origin-monitored" {
-        ncs:create {
-          ncs:nano-callback;
-        }
-      }
-      ncs:state "streaming:fw-configured" {
-        ncs:create {
-          ncs:nano-callback;
-        }
-      }
-      ncs:state "ncs:ready";      
-    }
-
-    ncs:component-type "edge" {
-      ncs:state "ncs:init";
-      ncs:state "streaming:connected-to-dc" {
-        ncs:create {
-          ncs:nano-callback;
-        }
-      }
-      ncs:state "streaming:connected-to-skylight" {
-        ncs:create {
-          ncs:nano-callback;
-        }
-      }
-      ncs:state "ncs:ready";      
-    }
-  }
-
-  ncs:service-behavior-tree edge-servicepoint {
-    description "";
-    ncs:plan-outline-ref "streaming:edge-plan";
-
-    ncs:selector {
-      ncs:create-component "'self'" {
-        ncs:component-type-ref "ncs:self";
-      }
-      ncs:create-component "'dc'" {
-        ncs:component-type-ref "streaming:dc";
-      }
-      ncs:create-component "'edge'" {
-        ncs:pre-condition {
-          ncs:monitor
-            "$SERVICE/plan/component[type='streaming:dc']/state[name='ncs:ready']" {
-            ncs:trigger-expr "status = 'reached'";
-          }
-        }
-        ncs:component-type-ref "streaming:edge";
-      }
-    }
-  }
+// ACTIONS //////////////////////////////////////////////////////////////////////
 
   container actions {
-    tailf:action skylight-notification {
+    action skylight-notification {
       tailf:actionpoint skylight-notification;
       input {
         uses kicker:action-input-params;
       }
+    }
+    action optimize {
+      tailf:actionpoint optimize;
       output {
+        leaf result { 
+          type string; 
+        }
+      }
+    }
+    action vary-energy-price {
+      tailf:actionpoint vary-energy-price;
+      input {
+        leaf iterations {
+          type uint32;
+          default 10;
+        }
+      }
+      output {
+        leaf result { 
+          type string; 
+        }
       }
     }
   }
