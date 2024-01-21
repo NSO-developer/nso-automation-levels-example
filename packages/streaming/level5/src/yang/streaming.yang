@@ -44,9 +44,10 @@ module streaming {
   }
 
 // DC LIST //////////////////////////////////////////////////////////////////////
+
   list dc {
     description 
-      "List of available datacenters, and pointers to the devices considered of it";
+      "List of available datacenters, and pointers to the devices part of it";
 
     key name;  
     leaf name {
@@ -145,6 +146,7 @@ module streaming {
   }
 
 // ACTIONS //////////////////////////////////////////////////////////////////////
+
   container actions {
     action skylight-notification {
       tailf:actionpoint skylight-notification;

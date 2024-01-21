@@ -39,7 +39,7 @@ start-nso: ncs.conf
 
 start-cli:
 	@echo "\n#### Entering NSO Command Line Interface as user admin"
-	ncs_cli -Cu admin
+	-ncs_cli -Cu admin
 
 stop:
 	@if [ -d netsim ]; then ncs-netsim stop; echo "NETSIM network stopped"; else echo "NETSIM already stopped"; fi;

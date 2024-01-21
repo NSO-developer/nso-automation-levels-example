@@ -2,7 +2,7 @@ module streaming {
   yang-version 1.1;
   namespace "http://com/example/basic-streaming/streaming";
   prefix streaming;
-include streaming-plan;
+  include streaming-plan;
 
   import ietf-inet-types {
     prefix inet;
@@ -46,7 +46,7 @@ include streaming-plan;
 // DC LIST //////////////////////////////////////////////////////////////////////
 
   list dc {
-        description 
+    description 
       "List of available datacenters, and pointers to the devices part of it";
 
     key name;  

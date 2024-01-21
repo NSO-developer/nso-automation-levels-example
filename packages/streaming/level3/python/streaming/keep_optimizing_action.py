@@ -4,7 +4,7 @@ Permission to use this code as a starting point hereby granted
 
 This module implements an NSO action callback that is used to optimize the running services.
 When this action is invoked, it will start a background thread that reads the list of edge services
-and re-deploys them one by one at regular intervals (see INTERVAL_TIME below). Invoking the same
+and (<optimizes>) them one by one at regular intervals (see INTERVAL_TIME below). Invoking the same
 action again will make the thread terminate.
 
 See the top level README file for more information
@@ -43,7 +43,7 @@ class StreamerOptimizeAction(ncs.dp.Action):
             self.log.info(output.result)
 
     # worker_thread
-    # Reactively re-deploys edge service instances, one at a time. 
+    # (<Optimizes>) edge service instances, one at a time. 
     # The thread runs every few seconds (INTERVAL_TIME) until requested to stop.
     def worker_thread(self):
         try:
@@ -65,9 +65,8 @@ class StreamerOptimizeAction(ncs.dp.Action):
                         self.log.info(f'Optimizer found no services to optimize')
                         continue
                     edge = r.streaming__edge[edge_names.pop(0)]
-                    self.log.info(f'Optimizer re-deploying service {edge.name}')
-                    edge.reactive_re_deploy()
-                    
+                    self.log.info(f'Optimizer not yet implemented, service {edge.name} left unchanged')
+
         except Exception as e:
             self.log.error('ERROR: ', e)
             self.log.error(traceback.format_exc())

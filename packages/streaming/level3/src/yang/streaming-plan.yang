@@ -14,7 +14,7 @@ submodule streaming-plan {
     prefix tailf;
   }
 
-  description "
+    description "
     NSO Automation Levels Example
     (C) 2024 Cisco Systems
     Permission to use this code as a starting point hereby granted
@@ -85,6 +85,12 @@ submodule streaming-plan {
       ncs:state "streaming:fw-configured" {
         ncs:create {
           ncs:nano-callback;
+          ncs:pre-condition {
+            ncs:monitor
+              "/streaming:dc[name = $SERVICE/dc]" {
+              ncs:trigger-expr "is-active = 'true'";
+            }
+          }
         }
       }
       ncs:state "ncs:ready";      
@@ -95,13 +101,12 @@ submodule streaming-plan {
       ncs:state "streaming:connected-to-dc" {
         ncs:create {
           ncs:nano-callback;
-          // FIXME janl removed this for now
-          //ncs:post-action-node
-          //    "/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]" +
-          //    "/rpc/rpc-load-from-storage" {
-          //  ncs:action-name "load-from-storage";
-          //  ncs:result-expr "result = 'true'";
-          //}
+          ncs:pre-condition {
+            ncs:monitor
+              "$SERVICE/plan/component[type='streaming:dc']/state[name='ncs:ready']" {
+              ncs:trigger-expr "status = 'reached'";
+            }
+          }
         }
       }
       ncs:state "streaming:connected-to-skylight" {
@@ -127,12 +132,6 @@ submodule streaming-plan {
         ncs:component-type-ref "streaming:dc";
       }
       ncs:create-component "'edge'" {
-        ncs:pre-condition {
-          ncs:monitor
-            "$SERVICE/plan/component[type='streaming:dc']/state[name='ncs:ready']" {
-            ncs:trigger-expr "status = 'reached'";
-          }
-        }
         ncs:component-type-ref "streaming:edge";
       }
     }

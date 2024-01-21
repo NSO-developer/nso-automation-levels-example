@@ -1,6 +1,12 @@
 <ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
   <name>streaming</name>
   <package-version>1.0</package-version>
-  <description>TECOPS-2665</description>
+  <description>NSO Automation Levels Example Service</description>
   <ncs-min-version>6.1</ncs-min-version>
+  <component>
+    <name>main</name>
+    <application>
+      <python-class-name>streaming.main.Main</python-class-name>
+    </application>
+  </component>
 </ncs-package>
