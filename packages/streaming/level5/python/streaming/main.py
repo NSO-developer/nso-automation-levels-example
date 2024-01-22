@@ -19,6 +19,7 @@ See the top level README file for more information
 """
 import ncs
 from ncs.application import NanoService
+from ncs.dp import Action
 import uuid, math
 from streaming.skylight_notification_action import SkylightNotificationAction
 from streaming.keep_optimizing_action import StreamerOptimizeAction
@@ -83,6 +84,20 @@ class ConnectedToSkylight(NanoService):
         template = ncs.template.Template(service)
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)
 
+class LoadFromStoragePostAction(ncs.dp.Action):
+    # This action is meant to be invoked by the nano service as a post-action.
+    # The action instructs the origin server to load content from storage.
+    @Action.action
+    def cb_action(self, uinfo, name, kp, input, output, trans):
+        self.log.info(f'LoadFromStoragePostAction: for {kp}')
+        root = ncs.maagic.get_root(trans)
+        service = root._get_node(kp)
+        origin_name = root.dc[service.oper_status.chosen_dc].media_origin
+        self.log.info(f'Invoking load-from-storage rpc on {origin_name}')
+        root.devices.device[origin_name].rpc.rpc_load_from_storage.load_from_storage()
+        self.log.info(f'The load-from-storage rpc on {origin_name} is completed')
+        output.result = True
+
 # ---------------------------------------------
 # COMPONENT THREAD THAT WILL BE STARTED BY NCS.
 # ---------------------------------------------
@@ -111,6 +126,7 @@ class Main(ncs.application.Application):
         self.register_action('skylight-notification', SkylightNotificationAction)
         self.register_action('optimize', StreamerOptimizeAction)
         self.register_action('vary-energy-price', StreamerVaryEnergyPriceAction)
+        self.register_action('load-from-storage', LoadFromStoragePostAction)
 
         # When this setup method is finished, all registrations are
         # considered done and the application is 'started'.

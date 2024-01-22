@@ -143,6 +143,14 @@ module streaming {
         }
       }
     }
+    action load-from-storage {
+      tailf:actionpoint load-from-storage;
+      output {
+        leaf result {
+          type string;
+        }
+      }
+    }
   }
 
 // ACTIONS //////////////////////////////////////////////////////////////////////
