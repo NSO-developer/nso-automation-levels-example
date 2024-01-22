@@ -24,18 +24,13 @@ from streaming.skylight_notification_action import SkylightNotificationAction
 from streaming.keep_optimizing_action import StreamerOptimizeAction
 from streaming.vary_energy_price_action import StreamerVaryEnergyPriceAction
 
-class ConnectedToSkylight(NanoService):
+class DCInit(NanoService):
     JITTER_WEIGHT = 1
     PRICE_WEIGHT = 2
 
     @NanoService.create
     def cb_nano_create(self, tctx, root, service, plan, component, state, proplist, compproplist):
-        self.log.info(f'cb_nano_create: ConnectedToSkylight for {service.name}')
-        vars = ncs.template.Variables()
-
-        # Create a unique session ID from the service name
-        vars.add('SESSION_ID', str(uuid.uuid5(uuid.NAMESPACE_DNS,
-                 f'{service.name}-edge-connected-to-skylight')))
+        self.log.info(f'cb_nano_create: DCInit for {service.name}')
 
         # Find the DC with the lowest score (based on jitter, energy-price and DC capacity)
         best_score = 100000
@@ -62,13 +57,27 @@ class ConnectedToSkylight(NanoService):
             # This is just to keep operators informed, not affecting the service logic
             root.dc[service.oper_status.chosen_dc].oper_status.edge_clients.remove(service.name)
 
-        vars.add('DC', best_dc)                         # Value goes into the template applied now
         service.oper_status.chosen_dc = best_dc.name    # Value goes into operational data, usable
                                                         # by templates applied at later stages
 
         self.log.info(f'Using DC {root.dc[service.oper_status.chosen_dc].name}')
         # This is just to keep operators informed, not affecting the service logic
         root.dc[service.oper_status.chosen_dc].oper_status.edge_clients.create(service.name)
+
+class ConnectedToSkylight(NanoService):
+    JITTER_WEIGHT = 1
+    PRICE_WEIGHT = 2
+
+    @NanoService.create
+    def cb_nano_create(self, tctx, root, service, plan, component, state, proplist, compproplist):
+        self.log.info(f'cb_nano_create: ConnectedToSkylight for {service.name}')
+        vars = ncs.template.Variables()
+
+        # Create a unique session ID from the service name
+        vars.add('SESSION_ID', str(uuid.uuid5(uuid.NAMESPACE_DNS,
+                 f'{service.name}-edge-connected-to-skylight')))
+
+        vars.add('DC', service.oper_status.chosen_dc)   # Value goes into the template applied now
 
         # Apply the template
         template = ncs.template.Template(service)
@@ -85,13 +94,18 @@ class Main(ncs.application.Application):
         # through 'self.log' and is a ncs.log.Log instance.
         self.log.info('Main RUNNING')
 
+        # Nano service callbacks require a registration for a service point,
+        # component, and state, as specified in the corresponding data model
+        # and plan outline.
+        self.register_nano_service(servicepoint='edge-servicepoint',
+                                   componenttype="streaming:dc",
+                                   state="ncs:init",
+                                   nano_service_cls=DCInit)
+
         self.register_nano_service(servicepoint='edge-servicepoint',
                                    componenttype="streaming:edge",
                                    state="streaming:connected-to-skylight",
                                    nano_service_cls=ConnectedToSkylight)
-        # Nano service callbacks require a registration for a service point,
-        # component, and state, as specified in the corresponding data model
-        # and plan outline.
 
         # We would also like to register a few action callbacks
         self.register_action('skylight-notification', SkylightNotificationAction)
