@@ -36,11 +36,11 @@ submodule streaming-plan {
   }
   identity skylight-configured {
     base ncs:plan-state;  
-    description "connect Skylight to NSO";
+    description "Add DC to Skylight";
   }
   identity fw-configured {
     base ncs:plan-state;  
-    description "Add media origin to FW, and allow traffic in to the DC (only if DC is active)";
+    description "Allow traffic between media origin and edge";
   }
 
   identity edge {
@@ -52,7 +52,7 @@ submodule streaming-plan {
   }
   identity connected-to-dc {
     base ncs:plan-state;
-    description "Connect edge to DC (via FW)";
+    description "Connect edge to DC, synchronize content list";
   }
 
 // PLAN OUTLINE /////////////////////////////////////////////////////////////////
