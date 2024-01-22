@@ -36,15 +36,11 @@ submodule streaming-plan {
   }
   identity skylight-configured {
     base ncs:plan-state;  
-    description "connect Skylight to NSO";
-  }
-  identity media-origin-monitored {
-    base ncs:plan-state;  
-    description "Add media origin to Skylight";
+    description "Add DC to Skylight";
   }
   identity fw-configured {
     base ncs:plan-state;  
-    description "Add media origin to FW, and allow traffic in to the DC (only if DC is active)";
+    description "Allow traffic between media origin and edge";
   }
 
   identity edge {
@@ -56,7 +52,7 @@ submodule streaming-plan {
   }
   identity connected-to-dc {
     base ncs:plan-state;
-    description "Connect edge to DC (via FW)";
+    description "Connect edge to DC, synchronize content list";
   }
 
 // PLAN OUTLINE /////////////////////////////////////////////////////////////////
@@ -71,13 +67,12 @@ submodule streaming-plan {
     }
 
     ncs:component-type "dc" {
-      ncs:state "ncs:init";
-      ncs:state "streaming:skylight-configured" {
+      ncs:state "ncs:init" {
         ncs:create {
           ncs:nano-callback;
         }
       }
-      ncs:state "streaming:media-origin-monitored" {
+      ncs:state "streaming:skylight-configured" {
         ncs:create {
           ncs:nano-callback;
         }
@@ -95,6 +90,10 @@ submodule streaming-plan {
       ncs:state "streaming:connected-to-dc" {
         ncs:create {
           ncs:nano-callback;
+          ncs:post-action-node "$SERVICE" {
+            ncs:action-name "load-from-storage";
+            ncs:result-expr "result = 'true'";
+          }
         }
       }
       ncs:state "streaming:connected-to-skylight" {
