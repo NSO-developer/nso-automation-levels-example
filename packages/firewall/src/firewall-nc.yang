@@ -1,0 +1,18 @@
+module firewall-nc {
+  yang-version 1.1;
+  namespace "http://tail-f.com/ns/ned-id/firewall-nc";
+  prefix firewall-nc;
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  import tailf-ncs-ned {
+    prefix ned;
+  }
+
+  identity firewall-nc {
+    tailf:abstract;
+    base ned:netconf-ned-id;
+  }
+}
