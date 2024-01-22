@@ -17,6 +17,7 @@ netsim:
 	@if [ ! -d netsim ]; then                              \
 		ncs-netsim                                           \
 			create-network packages/origin     2 origin        \
+			create-network packages/firewall   2 fw            \
 			create-network packages/edge       4 edge;         \
 		ncs-netsim add-device packages/skylight skylight;    \
 		ncs-netsim ncs-xml-init > ncs-cdb/netsim-init.xml;   \
