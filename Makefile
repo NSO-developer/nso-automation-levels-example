@@ -25,7 +25,7 @@ netsim:
 
 start-netsims: netsim
 	@echo "\n#### Starting netsim network"
-	@ncs-netsim is-alive origin0 | grep "DEVICE origin0 OK"; if [ $$? = 0 ]; then echo "NETSIM network already running"; else ncs-netsim start; fi
+	@ncs-netsim is-alive origin0 | grep "DEVICE origin0 OK"; if [ $$? = 0 ]; then echo "NETSIM network already running"; else ncs-netsim -a start; fi
 
 start-nso: ncs.conf
 	@echo "\n#### Starting NSO"
@@ -42,7 +42,7 @@ start-cli:
 	-ncs_cli -Cu admin
 
 stop:
-	@if [ -d netsim ]; then ncs-netsim stop; echo "NETSIM network stopped"; else echo "NETSIM already stopped"; fi;
+	@if [ -d netsim ]; then ncs-netsim -a stop; echo "NETSIM network stopped"; else echo "NETSIM already stopped"; fi;
 	@ncs --status > /dev/null 2>&1; if [ $$? = 0 ]; then ncs --stop; echo "NSO stopped"; else echo "NSO already stopped"; fi
 
 clean: stop
