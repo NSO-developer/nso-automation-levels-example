@@ -38,10 +38,6 @@ submodule streaming-plan {
     base ncs:plan-state;  
     description "connect Skylight to NSO";
   }
-  identity media-origin-monitored {
-    base ncs:plan-state;  
-    description "Add media origin to Skylight";
-  }
   identity fw-configured {
     base ncs:plan-state;  
     description "Add media origin to FW, and allow traffic in to the DC (only if DC is active)";
@@ -77,11 +73,6 @@ submodule streaming-plan {
         }
       }
       ncs:state "streaming:skylight-configured" {
-        ncs:create {
-          ncs:nano-callback;
-        }
-      }
-      ncs:state "streaming:media-origin-monitored" {
         ncs:create {
           ncs:nano-callback;
         }
