@@ -29,6 +29,18 @@
       </config>
     </device>
   </devices>
+  <devices xmlns="http://tail-f.com/ns/ncs">
+      <device>
+          <name>{$EDGE}</name>
+          <config>
+              <twamp xmlns="urn:ietf:params:xml:ns:yang:ietf-twamp">
+                  <session-reflector>
+                      <admin-state>true</admin-state>
+                  </session-reflector>
+              </twamp>
+          </config>
+      </device>
+  </devices>
   <kickers xmlns="http://tail-f.com/ns/kicker">
     <notification-kicker xmlns="http://tail-f.com/ns/ncs-kicker">
       <id>skylight-notification-kicker</id>

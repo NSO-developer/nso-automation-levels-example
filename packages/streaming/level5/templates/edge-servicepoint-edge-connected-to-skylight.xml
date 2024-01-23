@@ -1,5 +1,6 @@
 <config-template xmlns="http://tail-f.com/ns/config/1.0">
   <?set EDGE = {./name}?>
+  <?set DC = {./oper-status/chosen-dc}?>
   <?set-root-node {/}?>
   <devices xmlns="http://tail-f.com/ns/ncs">
     <device>
@@ -27,6 +28,18 @@
         </sessions>
       </config>
     </device>
+  </devices>
+  <devices xmlns="http://tail-f.com/ns/ncs">
+      <device>
+          <name>{$EDGE}</name>
+          <config>
+              <twamp xmlns="urn:ietf:params:xml:ns:yang:ietf-twamp">
+                  <session-reflector>
+                      <admin-state>true</admin-state>
+                  </session-reflector>
+              </twamp>
+          </config>
+      </device>
   </devices>
   <kickers xmlns="http://tail-f.com/ns/kicker">
     <notification-kicker xmlns="http://tail-f.com/ns/ncs-kicker">
