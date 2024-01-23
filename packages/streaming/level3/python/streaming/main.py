@@ -25,6 +25,15 @@ from streaming.skylight_notification_action import SkylightNotificationAction
 from streaming.keep_optimizing_action import StreamerOptimizeAction
 from streaming.vary_energy_price_action import StreamerVaryEnergyPriceAction
 
+class FwConfigured(NanoService):
+    @NanoService.create
+    def cb_nano_create(self, tctx, root, service, plan, component, state, proplist, compproplist):
+        self.log.info(f'cb_nano_create: FwConfigured for {service.name}')
+
+        # Apply the template
+        template = ncs.template.Template(service)
+        template.apply('edge-servicepoint-dc-fw-configured')
+
 class ConnectedToSkylight(NanoService):
     @NanoService.create
     def cb_nano_create(self, tctx, root, service, plan, component, state, proplist, compproplist):
@@ -66,6 +75,11 @@ class Main(ncs.application.Application):
         # Nano service callbacks require a registration for a service point,
         # component, and state, as specified in the corresponding data model
         # and plan outline.
+        self.register_nano_service(servicepoint='edge-servicepoint',
+                                   componenttype="streaming:dc",
+                                   state="streaming:fw-configured",
+                                   nano_service_cls=FwConfigured)
+
         self.register_nano_service(servicepoint='edge-servicepoint',
                                    componenttype="streaming:edge",
                                    state="streaming:connected-to-skylight",
