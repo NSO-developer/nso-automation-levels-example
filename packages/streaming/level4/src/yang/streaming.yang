@@ -22,6 +22,12 @@ module streaming {
   import skylight-nc {
     prefix skylight-nc;
   }
+  import firewall-nc {
+    prefix firewall-nc;
+  }
+  import origin-nc {
+    prefix origin-nc;
+  }
   import edge-nc {
     prefix edge-nc;
   }
@@ -58,10 +64,18 @@ module streaming {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
+      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id, 
+            'firewall-nc:firewall-nc')" {
+        error-message "Only the name of a firewall device makes sense here.";
+      }
     }
     leaf media-origin {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
+      }
+      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id, 
+            'origin-nc:origin-nc')" {
+        error-message "Only the name of an origin video server device makes sense here.";
       }
     }
     leaf skylight {

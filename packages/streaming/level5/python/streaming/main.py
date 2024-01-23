@@ -45,8 +45,8 @@ class DCInit(NanoService):
                 continue # Already full, not an option
             dc_jitter = float(dc.oper_status.jitter)
             dc_price = int(dc.oper_status.energy_price)
-            dc_score = ConnectedToSkylight.JITTER_WEIGHT * math.log10(dc_jitter) + \
-                       ConnectedToSkylight.PRICE_WEIGHT * math.log10(dc_price)
+            dc_score = DCInit.JITTER_WEIGHT * math.log10(dc_jitter) + \
+                       DCInit.PRICE_WEIGHT * math.log10(dc_price)
             self.log.info(f'Checking DC {dc.name}: jitter {dc_jitter} price {dc_price} -> score {dc_score}')
             if dc_score < best_score:
                 best_score = dc_score
@@ -66,9 +66,6 @@ class DCInit(NanoService):
         root.dc[service.oper_status.chosen_dc].oper_status.edge_clients.create(service.name)
 
 class ConnectedToSkylight(NanoService):
-    JITTER_WEIGHT = 1
-    PRICE_WEIGHT = 2
-
     @NanoService.create
     def cb_nano_create(self, tctx, root, service, plan, component, state, proplist, compproplist):
         self.log.info(f'cb_nano_create: ConnectedToSkylight for {service.name}')
