@@ -5,7 +5,7 @@
 
 
 -define(NS, 'http://tail-f.com/ns/cleu24/tecops-2665/origin').
--define(CONTENT_LOAD_TIME, 5000). % ms
+-define(CONTENT_LOAD_TIME, 8000). % ms
 
 -record(state, {maapi :: econfd:socket()}).
 

@@ -39,7 +39,9 @@ start-nso: ncs.conf
 	@./netsim-simulate-jitter.sh dc1 25
 	@./netsim-simulate-energy-price.sh dc0 100
 	@./netsim-simulate-energy-price.sh dc1 75
-	@ncs_cmd -u admin -c 'maction /ncs:devices/sync-from'
+	@echo "\n#### Syncing-from all devices"
+	@ncs_cmd -u admin -c 'maction /ncs:devices/sync-from' | grep -v sync-result | grep -v "result true"
+	@ncs_cmd -u admin -c 'mset /ncs:devices/ncs:device{"origin0"}/ncs:read-timeout 60; mset /ncs:devices/ncs:device{"origin1"}/ncs:read-timeout 60;'
 	@ncs_load -u admin -lm edge_init.xml
 
 start-cli:
