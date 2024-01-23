@@ -56,4 +56,4 @@ clean: stop
 	@for p in packages/*; do echo "\n#### Cleaning $$p"; make -C $$p/src clean; done
 	@rm -rf netsim
 	@-rm ncs-cdb/netsim-init.xml
-	@ncs-setup --reset
+	@-rm -rf ncs-cdb/*.cdb ncs-cdb/rollback* logs/* state/* # this is what "ncs-setup --reset" does
