@@ -58,9 +58,6 @@ class ConnectedToSkylight(NanoService):
         # Create a unique session ID from the service name
         vars.add('SESSION_ID', str(uuid.uuid5(uuid.NAMESPACE_DNS,
                  f'{service.name}-edge-connected-to-skylight')))
-
-        vars.add('DC', service.oper_status.chosen_dc)   # Value goes into the template applied now
-
         # Apply the template
         template = ncs.template.Template(service)
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)
@@ -78,7 +75,6 @@ class LoadFromStoragePostAction(ncs.dp.Action):
         root.devices.device[origin_name].rpc.rpc_load_from_storage.load_from_storage()
         self.log.info(f'The load-from-storage rpc on {origin_name} is completed')
         output.result = True
-
 
 # ---------------------------------------------
 # COMPONENT THREAD THAT WILL BE STARTED BY NCS.

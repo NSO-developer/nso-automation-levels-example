@@ -8,7 +8,7 @@ SRC = yang/streaming.yang
 DIRS = ../load-dir java/src/$(JDIR)/$(NS)
 FXS = $(SRC:yang/%.yang=../load-dir/%.fxs)
 # Allow including the NED (/devices/device/...) YANG files
-YANGPATH = yang/:../../../skylight/src/ncsc-out/modules/yang/:../../../skylight/src/:../../../edge/src/
+YANGPATH = yang/:../../../skylight/src/ncsc-out/modules/yang/:../../../skylight/src/:../../../edge/src/:../../../firewall/src/:../../../origin/src/
 
 NCSCPATH   = $(YANGPATH:%=--yangpath %)
 YANGERPATH = $(YANGPATH:%=--path %)

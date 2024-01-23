@@ -34,16 +34,6 @@ class ConnectedToSkylight(NanoService):
         # Create a unique session ID from the service name
         vars.add('SESSION_ID', str(uuid.uuid5(uuid.NAMESPACE_DNS,
                  f'{service.name}-edge-connected-to-skylight')))
-
-        # Find the DC with the lowest jitter
-        best_dc = None
-        self.log.info(f'Selection of DC with the lowest jitter not yet implemented')
-        if best_dc is None:
-            raise Exception('No DC found')
-        
-        vars.add('DC', best_dc)                         # Value goes into the template applied now
-        service.oper_status.chosen_dc = best_dc.name    # Value goes into operational data, usable
-                                                        # by templates applied at later stages
         # Apply the template
         template = ncs.template.Template(service)
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)
