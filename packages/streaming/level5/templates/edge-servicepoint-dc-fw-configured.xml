@@ -2,4 +2,78 @@
                  servicepoint="edge-servicepoint"
                  componenttype="streaming:dc"
                  state="streaming:fw-configured">
+  <?set EDGE = {./name}?>
+  <?set DC = {./oper-status/chosen-dc}?>
+  <?set-root-node {/}?>
+  <?set EDGE_ADDR = {/ncs:devices/device[name=$EDGE]/address}?>
+  <?set ORIGIN_ADDR = {/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]/address}?>
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device>
+      <name>{/ncs:devices/device[name=/streaming:dc[name=$DC]/fw]/name}</name>
+      <config>
+        <acl xmlns="http://openconfig.net/yang/acl">
+          <acl-sets>
+            <acl-set>
+              <name>{$EDGE}</name>
+              <type>ACL_IPV4</type>
+              <config>
+                <name>{$EDGE}</name>
+                <type>ACL_IPV4</type>
+              </config>
+              <acl-entries>
+                <acl-entry>
+                  <sequence-id>10</sequence-id>
+                  <config>
+                    <sequence-id>10</sequence-id>
+                    <description>accept ingress edge to origin</description>
+                  </config>
+                  <ipv4>
+                    <config>
+                      <source-address>{$EDGE_ADDR}/32</source-address>
+                      <destination-address>{$ORIGIN_ADDR}/32</destination-address>
+                    </config>
+                  </ipv4>
+                  <actions>
+                    <config>
+                      <forwarding-action>ACCEPT</forwarding-action>
+                    </config>
+                  </actions>
+                </acl-entry>
+                <acl-entry>
+                  <sequence-id>20</sequence-id>
+                  <config>
+                    <sequence-id>20</sequence-id>
+                    <description>accept egress origin to edge</description>
+                  </config>
+                  <ipv4>
+                    <config>
+                      <source-address>{$ORIGIN_ADDR}/32</source-address>
+                      <destination-address>{$EDGE_ADDR}/32</destination-address>
+                    </config>
+                  </ipv4>
+                  <actions>
+                    <config>
+                      <forwarding-action>ACCEPT</forwarding-action>
+                    </config>
+                  </actions>
+                </acl-entry>
+                <acl-entry>
+                  <sequence-id>30</sequence-id>
+                  <config>
+                    <sequence-id>30</sequence-id>
+                    <description>reject all else</description>
+                  </config>
+                  <actions>
+                    <config>
+                      <forwarding-action>REJECT</forwarding-action>
+                    </config>
+                  </actions>
+                </acl-entry>
+              </acl-entries>
+            </acl-set>
+          </acl-sets>
+        </acl>
+      </config>
+    </device>
+  </devices>
 </config-template>
