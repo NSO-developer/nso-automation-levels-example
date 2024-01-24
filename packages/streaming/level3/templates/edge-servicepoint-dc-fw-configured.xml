@@ -27,8 +27,8 @@
                   </config>
                   <ipv4>
                     <config>
-                      <source-address>{$EDGE_ADDR}</source-address>
-                      <destination-address>{$ORIGIN_ADDR}</destination-address>
+                      <source-address>{$EDGE_ADDR}/32</source-address>
+                      <destination-address>{$ORIGIN_ADDR}/32</destination-address>
                     </config>
                   </ipv4>
                   <actions>
@@ -45,8 +45,8 @@
                   </config>
                   <ipv4>
                     <config>
-                      <source-address>{$ORIGIN_ADDR}</source-address>
-                      <destination-address>{$EDGE_ADDR}</destination-address>
+                      <source-address>{$ORIGIN_ADDR}/32</source-address>
+                      <destination-address>{$EDGE_ADDR}/32</destination-address>
                     </config>
                   </ipv4>
                   <actions>
