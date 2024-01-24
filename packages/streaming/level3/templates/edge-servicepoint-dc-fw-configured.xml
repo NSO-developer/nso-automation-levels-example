@@ -2,19 +2,12 @@
                  servicepoint="edge-servicepoint"
                  componenttype="streaming:dc"
                  state="streaming:fw-configured">
-  <?set DC = {./name}?>
-  <?set FW = fw0?>
-  <?set EDGE_ADDR = 10.10.0.1/8?>
-  <?set ORIGIN_ADDR = 10.0.0.1/8?>
-<!--
-  <?set FW = {./fw}?>
-  <?set EDGE_ADDR = {/ncs:devices/device[name=/streaming:dc[name=$DC]/edge]/address}?>
-  <?set ORIGIN_ADDR = {/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]/address}?>
--->
+  <?set EDGE = {./name}?>
+  <?set DC = {./dc}?>
   <?set-root-node {/}?>
   <devices xmlns="http://tail-f.com/ns/ncs">
     <device>
-      <name>{$FW}</name>
+      <name>{/ncs:devices/ncs:device[ncs:name=/streaming:dc[streaming:name=$DC]/streaming:fw]/ncs:name}</name>
       <config>
         <acl xmlns="http://openconfig.net/yang/acl">
           <acl-sets>
