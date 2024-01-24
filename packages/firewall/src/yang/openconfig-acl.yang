@@ -459,14 +459,14 @@ module openconfig-acl {
           }
         }
 
-        uses oc-match:ipv4-protocol-fields-top {
+        uses oc-match:ipv4-protocol-fields-top; /*{
           when "../../config/type='ACL_IPV4' or " +
             "../../config/type='ACL_MIXED'" {
             description
               "IPv4-layer fields are valid when the ACL type is
               IPv4 or MIXED";
           }
-        }
+        }*/
 
         uses oc-match:mpls-header-top {
           when "../../config/type='ACL_MPLS' or " +
