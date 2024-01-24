@@ -14,10 +14,10 @@
         <acl xmlns="http://openconfig.net/yang/acl">
           <acl-sets>
             <acl-set>
-              <name>rules</name>
+              <name>{$EDGE}</name>
               <type>ACL_IPV4</type>
               <config>
-                <name>rules</name>
+                <name>{$EDGE}</name>
                 <type>ACL_IPV4</type>
               </config>
               <acl-entries>
