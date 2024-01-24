@@ -5,9 +5,11 @@
   <?set EDGE = {./name}?>
   <?set DC = {./dc}?>
   <?set-root-node {/}?>
+  <?set EDGE_ADDR = {/ncs:devices/device[name=$EDGE]/address}?>
+  <?set ORIGIN_ADDR = {/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]/address}?>
   <devices xmlns="http://tail-f.com/ns/ncs">
     <device>
-      <name>{/ncs:devices/ncs:device[ncs:name=/streaming:dc[streaming:name=$DC]/streaming:fw]/ncs:name}</name>
+      <name>{/ncs:devices/device[name=/streaming:dc[name=$DC]/fw]/name}</name>
       <config>
         <acl xmlns="http://openconfig.net/yang/acl">
           <acl-sets>
