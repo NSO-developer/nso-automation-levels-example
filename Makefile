@@ -2,13 +2,31 @@
 # (C) 2024 Cisco Systems
 # Permission to use this code as a starting point hereby granted
 
-all: build start
+all: check-level build start
 
 build: build-packages netsim
 
 start: start-netsims start-nso start-cli
 
 build-packages: build-services
+
+check-level: packages/streaming/current
+	@echo "\n#### Streaming service implementation selection"
+	@./streaming-switch-level.sh
+
+packages/streaming/current:
+	@echo "\n#### Streaming service implementation not selected"
+	@echo "Before we begin, you need to select implementation of the streaming service"
+	@echo "See the README file for more information"
+	@echo ""
+	@echo " - You may select one of the existing implementations. For example:"
+	@echo "   ./streaming-switch-level.sh level5"
+	@echo ""
+	@echo " - You may create an implementation of your own, then select that one. For example:"
+	@echo "   cp -r packages/streaming/level3 packages/streaming/myway"
+	@echo "   ./streaming-switch-level.sh myway"
+	@echo ""
+	@false
 
 build-neds:
 	@for p in `grep -l ned-id packages/*/src/package-meta-data.xml.in`; do n=`dirname $$p`; echo "\n#### Building NED `dirname $$n`"; make -C $$n || exit; done
