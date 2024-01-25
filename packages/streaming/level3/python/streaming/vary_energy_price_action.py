@@ -82,7 +82,7 @@ class StreamerVaryEnergyPriceAction(ncs.dp.Action):
                     if dc.name not in price_targets:
                         price_targets[dc.name] = { 
                             'steps': random.choice([1,3,4,5,8]), 
-                            'value': max(0,int(random.normalvariate(mu=100, sigma=40))) 
+                            'value': max(1,int(random.normalvariate(mu=100, sigma=40))) 
                         }
                     curr_price = int(dc.oper_status.energy_price) or 100
                     curr_steps = price_targets[dc.name].get('steps',1)
