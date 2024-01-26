@@ -6,7 +6,9 @@
   <?set DC = {./dc}?>
   <?set-root-node {/}?>
   <?set EDGE_ADDR = {/ncs:devices/device[name=$EDGE]/address}?>
+  <?set EDGE_PORT = 554?>
   <?set ORIGIN_ADDR = {/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]/address}?>
+  <?set ORIGIN_PORT = 554?>
   <devices xmlns="http://tail-f.com/ns/ncs">
     <device>
       <name>{/ncs:devices/device[name=/streaming:dc[name=$DC]/fw]/name}</name>
@@ -33,6 +35,12 @@
                       <destination-address>{$ORIGIN_ADDR}/32</destination-address>
                     </config>
                   </ipv4>
+                  <transport>
+                    <config>
+                      <source-port>{$EDGE_PORT}</source-port>
+                      <destination-port>{$ORIGIN_PORT}</destination-port>
+                    </config>
+                  </transport>
                   <actions>
                     <config>
                       <forwarding-action>ACCEPT</forwarding-action>
@@ -51,6 +59,12 @@
                       <destination-address>{$EDGE_ADDR}/32</destination-address>
                     </config>
                   </ipv4>
+                  <transport>
+                    <config>
+                      <source-port>{$ORIGIN_PORT}</source-port>
+                      <destination-port>{$EDGE_PORT}</destination-port>
+                    </config>
+                  </transport>
                   <actions>
                     <config>
                       <forwarding-action>ACCEPT</forwarding-action>

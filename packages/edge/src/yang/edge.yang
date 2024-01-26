@@ -84,6 +84,12 @@ module edge {
     description
       "The edge streaming server.";
 
+    leaf streaming-port {
+      description
+        "The port where origin and edge streamers handle content data.";
+      type inet:port-number;
+    }
+
     leaf origin-server {
       description
         "The configured media origin server.";
