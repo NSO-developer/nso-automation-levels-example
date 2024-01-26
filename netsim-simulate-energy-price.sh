@@ -1,11 +1,11 @@
 #!/bin/sh
 
 usage() {
-  echo "usage: $0 [-h] | dc energy-price"
+  echo "usage: $0 [-h] | <dc> <energy-price>"
 }
 
-if [ "$NCS_DIR" == "" ]; then
-  echo "ERROR: NCS_DIR is not setup. Source ncsrc to setup NSO environment before proceeding"
+if [ -z "$NCS_DIR" ]; then
+  echo "ERROR: Environment variable NCS_DIR is not set. Source ncsrc to setup NSO environment before proceeding"
   exit 1
 fi
 

@@ -2,22 +2,18 @@
 # (C) 2024 Cisco Systems
 # Permission to use this code as a starting point hereby granted
 
-ifeq "$(NCS_DIR)" ""
-$(error NCS_DIR is not setup. Source ncsrc to setup NSO environment before proceeding)
-endif
-
 NSO_VERSION = $(shell ncs --version)
 
-top:
-	@echo "NSO version: $(NSO_VERSION)"
+top: check-level
+	@echo "Using NSO version: $(NSO_VERSION)"
 	@echo
 	@echo "Makefile rules (the most used):"
-	@echo " * all              Build and start the current selected level."
-	@echo " * build            Build all packages and create the netsims."
-	@echo " * build-packages   Build all packages."
-	@echo " * start            Start netsims, NSO and enter the NSO cli."
-	@echo " * stop             Stop environment"
-	@echo " * clean            Stop environment and clean all build files."
+	@echo " * all              Build and start everything with the currently selected streaming service"
+	@echo " * build            Build all packages and create the NETSIM devices"
+	@echo " * build-packages   Build all packages"
+	@echo " * start            Start the NETSIMs, NSO and enter the NSO CLI"
+	@echo " * stop             Stop NSO and the NETSIM devices"
+	@echo " * clean            Stop NSO, the NETSIM devices, clean all build files, and reset the config database"
 
 all: check-level build start
 
@@ -28,6 +24,9 @@ start: start-netsims start-nso start-cli
 build-packages: build-services
 
 check-level: packages/streaming/current
+ifeq "$(NCS_DIR)" ""
+	$(error Environment variable NCS_DIR is not set. Source ncsrc to setup NSO environment before proceeding)
+endif
 	@echo "\n#### Streaming service implementation selection"
 	@./streaming-switch-level.sh
 
