@@ -4,7 +4,7 @@ usage() {
   echo "usage: $0 [-h] | dc jitter"
 }
 
-if [ "$NCS_DIR" == "" ]; then
+if [ x"$NCS_DIR" = "x" ]; then
   echo "ERROR: NCS_DIR is not setup. Source ncsrc to setup NSO environment before proceeding"
   exit 1
 fi
