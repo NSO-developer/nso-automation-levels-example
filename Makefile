@@ -2,6 +2,23 @@
 # (C) 2024 Cisco Systems
 # Permission to use this code as a starting point hereby granted
 
+ifeq "$(NCS_DIR)" ""
+$(error NCS_DIR is not setup. Source ncsrc to setup NSO environment before proceeding)
+endif
+
+NSO_VERSION = $(shell ncs --version)
+
+top:
+	@echo "NSO version: $(NSO_VERSION)"
+	@echo
+	@echo "Makefile rules (the most used):"
+	@echo " * all              Build and start the current selected level."
+	@echo " * build            Build all packages and create the netsims."
+	@echo " * build-packages   Build all packages."
+	@echo " * start            Start netsims, NSO and enter the NSO cli."
+	@echo " * stop             Stop environment"
+	@echo " * clean            Stop environment and clean all build files."
+
 all: check-level build start
 
 build: build-packages netsim
@@ -73,5 +90,5 @@ stop:
 clean: stop
 	@for p in packages/*; do echo "\n#### Cleaning $$p"; make -C $$p/src clean; done
 	@rm -rf netsim
-	@-rm ncs-cdb/netsim-init.xml
+	@-rm -f ncs-cdb/netsim-init.xml
 	@-rm -rf ncs-cdb/*.cdb ncs-cdb/rollback* logs/* state/* # this is what "ncs-setup --reset" does
