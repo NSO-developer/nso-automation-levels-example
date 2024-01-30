@@ -74,9 +74,6 @@ class ConnectedToSkylight(NanoService):
         # Create a unique session ID from the service name
         vars.add('SESSION_ID', str(uuid.uuid5(uuid.NAMESPACE_DNS,
                  f'{service.name}-edge-connected-to-skylight')))
-
-        vars.add('DC', service.oper_status.chosen_dc)   # Value goes into the template applied now
-
         # Apply the template
         template = ncs.template.Template(service)
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)
