@@ -10,6 +10,7 @@
      <name>{$EDGE}</name>
      <config>
        <edge xmlns="http://tail-f.com/ns/cleu24/tecops-2665/edge">
+         <streaming-port>554</streaming-port>
          <origin-server>{/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]/address}</origin-server>
        </edge>
      </config>
@@ -18,8 +19,10 @@
      <name>{/ncs:devices/device[name=/streaming:dc[name=$DC]/media-origin]/name}</name>
      <config>
        <origin xmlns="http://tail-f.com/ns/cleu24/tecops-2665/origin">
+         <streaming-port>554</streaming-port>
          <edge>
            <hostname>{/ncs:devices/device[name=$EDGE]/address}</hostname>
+           <streaming-port>{/ncs:devices/device[name=$EDGE]/config/tc-edge:edge/streaming-port}</streaming-port>
          </edge>
          <?copy-tree {/ncs:devices/device[name=$EDGE]/config/tc-edge:edge}?>
        </origin>

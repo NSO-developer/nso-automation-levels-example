@@ -50,12 +50,23 @@ module origin {
     description
       "The media origin server.";
 
+    leaf streaming-port {
+      description
+        "The port where origin and edge streamers handle content data.";
+      type inet:port-number;
+    }
+
     list edge {
       description
         "List of configured edge streamers.";
       key hostname;
       leaf hostname {
         type inet:host;
+      }
+      leaf streaming-port {
+        description
+          "The port where origin and edge streamers handle content data.";
+        type inet:port-number;
       }
     }
 
