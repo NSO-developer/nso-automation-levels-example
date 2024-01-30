@@ -86,7 +86,7 @@ stop:
 	@if [ -d netsim ]; then ncs-netsim -a stop; echo "NETSIM network stopped"; else echo "NETSIM already stopped"; fi;
 	@ncs --status > /dev/null 2>&1; if [ $$? = 0 ]; then ncs --stop; echo "NSO stopped"; else echo "NSO already stopped"; fi
 
-clean: stop
+clean: check-level stop
 	@for p in packages/*; do echo "\n#### Cleaning $$p"; make -C $$p/src clean; done
 	@rm -rf netsim
 	@-rm -f ncs-cdb/netsim-init.xml
