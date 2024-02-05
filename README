@@ -1,7 +1,5 @@
-TECOPS 2665
-===========
-
 Reaching Network Automation Level 5: Principles and Practice
+============================================================
 
 Once the Adaptive Service Activation Scripts (Network Automation
 Level 2) are left behind, a world of life-cycle flexibility and
@@ -32,89 +30,110 @@ Key takeaways:
   environment
 
 
-USE CASE
---------
-
-This lab has a video service with origin media servers for content in
-two data centers and edge streamers.
-
-The goal is to take an existing service without any service monitoring
-and create a closed loop automated service.
-
-This is achieved by introducing:
-* service and device monitoring,
-* code which will manage the service according to the defined metrics
-  and service quality levels.
-
-The service monitoring is done with TWAMP service monitoring with
-Accedian Skylight.
-
-The edge streamer device can simulate high jitter via the
-"toggle-jitter" RPC, see DEVICES section for further details. When the
-edge streamer device experiences high jitter, a service disruption occurs
-and a data center switch should take place.
-
-Furthermore, the lab has simple web service that reports variable energy
-prices that fluctuates over time. When the inactive data center's energy
-price falls below the active data center's energy price plus a
-configurable threshhold, a data center switch should also take place.
+DISCLAIMER
+----------
+This training document is to familiarize with Network Services
+Orchestrator (NSO) and Network Automation Levels. Although the lab
+design and configuration examples could be used as a reference, it’s not
+a real design, thus not all recommended features are used, or enabled
+optimally. For the design related questions please contact your
+representative at Cisco, or a Cisco partner.
 
 
-DEVICES
--------
+THE SCENARIO
+------------
 
-The netsim devices for the edge and origin packages have data providers
-that will provide operational data for the configured content list. The
-device will have metrics for buffer fill, ingress and egress traffic,
-and also jitter. The values are random around a base value. It is
-possible to toggle a high/low jitter value with the toggle-jitter RPC.
+Background
+----------
+As an industry, we have been talking for years about "network
+automation". The exact meaning of that concept has often been rather
+nebulous. Attempts at defining more specific levels, similarly to how
+the auto industry defined specified levels of "self driving cars".
 
-When logging into an edge device the initial content list is empty, and
-thus the operational data is zeroed.
+Even with the examples showing what the network automation levels mean,
+however, people did not get very clear and intuitive understanding of
+what the levels mean.
 
-    edge0# show edge
-    edge buffer-fill 0
-    edge ingress-speed 0
-    edge ingress-traffic 0
-    edge jitter     0.0
-    edge egress-speed 0
-    edge egress-traffic 0
+The purpose of this lab is to give the participants a concrete,
+hands-on, intuitive feel for the meaning of level 3, level 4 and level 5
+network automation.
 
-Populating the content list with two elements will populate the
-operational data. Note that the operational data metrics are real time
-values, subsequent readings will give different results!
+In this lab we going on a journey, starting at a pre-existing NSO level
+3 service. The first stage of the journey will be to upgrade it to a
+level 4 implementation by adding service monitoring functionality into
+the service definition. The second stage takes the service to level 5 by
+adding a mechanism for constant, on-going optimization of all service
+instances.
 
-    edge0# config
-    edge0(config)# edge content "V for Vendetta"
-    edge0(config-content-V for Vendetta)# edge content Primer
-    edge0(config)# commit
-    Commit complete.
-    edge0(config)# exit
-    edge0# show edge
-    edge buffer-fill 94
-    edge ingress-speed 21421818
-    edge ingress-traffic 22737442
-    edge jitter     0.131
-    edge egress-speed 22198500
-    edge egress-traffic 21194120
-                    BUFFER  INGRESS   INGRESS           EGRESS    EGRESS
-    CONTENT ID      FILL    SPEED     TRAFFIC   JITTER  SPEED     TRAFFIC
-    ------------------------------------------------------------------------
-    Primer          98      11346476  10661960  0.377   11189595  10681591
-    V for Vendetta  90      10643824  11489777  0.929   11114149  10629172
+You can read more about the network automation levels in this blog post
 
-Toggle high jitter by invoking the toggle-jitter RPC
+    https://community.cisco.com/t5/nso-developer-hub-blogs/network-automation-levels/ba-p/4742665
 
-    edge0# toggle-jitter
-    edge0# show edge
-    edge buffer-fill 73
-    edge ingress-speed 22963722
-    edge ingress-traffic 22160378
-    edge jitter     10.322
-    edge egress-speed 22282264
-    edge egress-traffic 21381530
-                    BUFFER  INGRESS   INGRESS           EGRESS    EGRESS
-    CONTENT ID      FILL    SPEED     TRAFFIC   JITTER  SPEED     TRAFFIC
-    ------------------------------------------------------------------------
-    Primer          83      10554788  11501184  10.82   10783739  10971589
-    V for Vendetta  92      11377185  10841050  10.083  11251753  10816474
+
+Video Delivery Service
+----------------------
+In this example, we are looking at a video delivery service. The service
+is implemented by a network of data centers (DCs) and edge devices. Each
+DC contains an Origin Video Server (this is something we made up for
+this lab), and a generic firewall. The edge devices are Edge Video
+Caches (again, this is something we made up for this lab), that are
+built to work together with the Origin Video Servers. Imagined end-users
+can then consume their video feeds through the Edge Video Caches.
+
+
+    +-------------+                         +-------------+
+    |             |       +----------+      |             |
+    |   dc0       |       | skylight |      |   dc1       |
+    |             |       +----------+      |             |
+    | +---------+ |                         | +---------+ |
+    | | origin0 | |                         | | origin1 | |
+    | +----v----+ |                         | +----v----+ |
+    |      |      |                         |      |      |
+    |   +--v--+   |                         |   +--v--+   |
+    |   | fw0 |   |                         |   | fw1 |   |
+    |   +--v--+   |                         |   +--v--+   |
+    +------|------+                         +-----/|\-----+
+          /              +-----------------------+ | \
+         /              /             +------------+  \
+    +---v---+      +---v---+      +---v---+       +---v---+
+    | edge0 |      | edge1 |      | edge2 |       | edge3 |
+    +-------+      +-------+      +-------+       +-------+
+
+    Fig 1. The network topology.
+
+The NSO service we are talking about here controls how the Edge Video
+Caches are connected to the DCs. Each Edge Video Cache must be connected
+to exactly one DC, but which one can vary over time, depending on the DC
+availability, delivered quality, load and the current energy price at
+the DC location.
+
+At the starting point of this lab, it is the NSO operators that manually
+decide through configuration which DCs are considered available and
+which Edge Video Caches are connected to which DCs. While the service at
+this level automates the device configuration work for the Origin Video
+Servers and firewalls, the manual decisions/configurations about DC
+availability and which Edge device should connect to which DC obviously
+is not automated to a high level. We call this level 3.
+
+
+Lab Starting-point
+------------------
+In the lab setup, we have a single NSO instance that controls all the
+DCs, all the relevant devices in them, and all the Edge devices. All the
+devices in the DC and the Edge devices are really NSO NETSIM devices.
+That means they basically only implement the management interfaces as
+described by their YANG models, but otherwise don’t really do anything.
+We have endowed some of these NETSIMs with a little bit of additional
+behavior, though, so that they react and respond to a few things. Such
+functionality will be described later, as needed.
+
+Also, logically part of each DC is an Accedian Skylight monitoring
+system. In our setup, there is really only one instance of a skylight
+system, or “device” as NSO tends to think of all managed systems as
+devices. A single skylight is enough since we think of it as running “in
+the cloud” outside our DCs.
+
+When we start, the NSO system is already up and running with the level 3
+service implementation, and there are Network Element Drivers (NEDs) for
+all device types installed, and the devices are already listed in the
+NSO device list.
