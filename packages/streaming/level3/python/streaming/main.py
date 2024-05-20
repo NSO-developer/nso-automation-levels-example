@@ -66,10 +66,10 @@ class Main(ncs.application.Application):
         # Nano service callbacks require a registration for a service point,
         # component, and state, as specified in the corresponding data model
         # and plan outline.
-        self.register_nano_service(servicepoint='edge-servicepoint',
-                                   componenttype="streaming:edge",
-                                   state="streaming:connected-to-skylight",
-                                   nano_service_cls=ConnectedToSkylight)
+        # self.register_nano_service(servicepoint='edge-servicepoint',
+        #                            componenttype="streaming:edge",
+        #                            state="streaming:connected-to-skylight",
+        #                            nano_service_cls=ConnectedToSkylight)
 
         # We would also like to register a few action callbacks
         self.register_action('skylight-notification', SkylightNotificationAction)
