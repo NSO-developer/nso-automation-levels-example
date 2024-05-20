@@ -17,7 +17,7 @@ else
   if [ -r "$ROOT"/packages/streaming/$1/package-meta-data.xml ]; then
     rm -f "$ROOT"/packages/streaming/current
     ln -s "$1" "$ROOT"/packages/streaming/current
-    echo -n "Set streaming service implementation to: "
+    echo "Set streaming service implementation to: "
     ls -l "$ROOT"/packages/streaming/current| awk '-F -> ' '{print $2}'
   else
     echo "'$1' is not a directory containing a streaming service implementation. Aborted."
