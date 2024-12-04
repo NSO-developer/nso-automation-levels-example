@@ -26,5 +26,37 @@
         </ne-config>
       </config>
     </service-endpoint>
+    <service-endpoint>
+      <endpoint-id>edge0-agent</endpoint-id>
+      <endpoint-name>edge0-agent</endpoint-name>
+      <description>Edge 0</description>
+      <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:unmanaged-endpoint</type>
+      <config>
+      </config>
+    </service-endpoint>
+    <service-endpoint>
+      <endpoint-id>edge1-agent</endpoint-id>
+      <endpoint-name>edge1-agent</endpoint-name>
+      <description>Edge 1</description>
+      <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:unmanaged-endpoint</type>
+      <config>
+      </config>
+    </service-endpoint>
+    <service-endpoint>
+      <endpoint-id>edge2-agent</endpoint-id>
+      <endpoint-name>edge2-agent</endpoint-name>
+      <description>Edge 2</description>
+      <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:unmanaged-endpoint</type>
+      <config>
+      </config>
+    </service-endpoint>
+    <service-endpoint>
+      <endpoint-id>edge3-agent</endpoint-id>
+      <endpoint-name>edge3-agent</endpoint-name>
+      <description>Edge 3</description>
+      <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:unmanaged-endpoint</type>
+      <config>
+      </config>
+    </service-endpoint>
   </service-endpoints>
 </config>
