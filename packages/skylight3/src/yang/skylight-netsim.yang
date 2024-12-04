@@ -1,0 +1,65 @@
+module skylight-netsim {
+  namespace "http://tail-f.com/pkg/skylight-netsim";
+  prefix skylight-netsim;
+
+  import tailf-common { prefix tailf; }
+
+  organization "Cisco Systems";
+  contact "<support@tail-f.com>";
+
+  description
+    "Skylight netsim models.";
+
+  revision 2023-12-14 {
+    description
+      "Inital version.";
+  }
+
+  typedef jitter-dev {
+    type decimal64 {
+      fraction-digits 3;
+    }
+    units ms;
+  }
+
+  grouping jitter-grouping {
+    leaf device {
+      description "Name of the device this notification pertains to.";
+      mandatory true;
+      type string;
+    }
+    leaf jitter {
+      description "Optional jitter value. If not specified, 
+        a simulated value will be generated automatically.";
+      type jitter-dev;
+    }
+  }
+
+  rpc send-notification-high-jitter {
+    tailf:actionpoint "skylight-send-notification";
+    input {
+      uses jitter-grouping;
+    }
+  }
+  rpc send-notification-low-jitter {
+    tailf:actionpoint "skylight-send-notification";
+    input {
+      uses jitter-grouping;
+    }
+  }
+
+  notification skylight-event {
+    description
+      "Event emitted from the Skylight Netsim device.";
+    leaf device {
+      description "Name of the device this notification pertains to.";
+      mandatory true;
+      type string;
+    }
+    leaf jitter {
+      description "Jitter observed pertaining to the device.";
+      mandatory true;
+      type jitter-dev;
+    }
+  }
+}

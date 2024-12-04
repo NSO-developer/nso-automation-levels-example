@@ -1,0 +1,130 @@
+module Accedian-service-endpoint-type {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/service/endpoint/type";
+  prefix acdsept;
+
+  import Accedian-type {
+    prefix acdt;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the type definitions of a Accedian
+    service endpoint.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-11-24 {
+    description
+      "Add the identity types ssc-endpoint and unmanaged-endpoint";
+  }
+  revision 2023-02-10 {
+    description
+      "Initial revision";
+  }
+
+  identity service-endpoint {
+    description
+      "Base type for the service endpoints";
+  }
+
+  identity generic-endpoint {
+    base service-endpoint;
+    description
+      "This type correspond to a non-specific service-endpoint
+      definition where the endpoint can be identified using only
+      an endpoint-id";
+  }
+
+  identity ne-endpoint {
+    base service-endpoint;
+    description
+      "This type correspond to a use case where
+      the service endpoint is hosted on a NSO-L3VPN deployment";
+  }
+
+  identity ssc-endpoint {
+    base service-endpoint;
+    description
+      "Skylight Sensor Control endpoint: This type correspond to
+      a use case where the endpoint is hosted on a Skylight
+      Sensor Control platform";
+  }
+
+  identity unmanaged-endpoint {
+    base service-endpoint;
+    description
+      "This type refers to an endpoint that is configured and
+      managed through other means than this Yang model. For example
+      a reflector from a third party.
+      It can also be used to represent a piece of hardware that
+      can behave as an endpoint without requiring configuration";
+  }
+
+  identity nid-endpoint {
+    base service-endpoint;
+    description
+      "Network Interface Device endpoint: This type of endpoint refers
+      to a test interface in a network interface device. It usually refer
+      to the test interface through device identification, network interfaces,
+      ports, etc...";
+  }
+
+  typedef service-endpoint-status {
+    description
+      "Defines the different status that can apply to a service endpoint";
+
+    type enumeration {
+      enum "ready" {
+        description
+          "The endpoint is configured and ready to perform actions such as
+          starting a session";
+      }
+
+      enum "not-ready" {
+        description
+          "The service-endpoint is still in transition toward a Ready state. It is
+          not in error but it cannot yet perform session actions";
+      }
+
+      enum "error" {
+        description
+          "The service-endpoint is currently in error state. It cannot currently perform
+          actions such as starting a session";
+      }
+    }
+  }
+
+  grouping service-endpoint-state-data {
+    description
+      "The data representing the current state of the session endpoint";
+
+    leaf status {
+      description
+        "The current status of the endpoint. Each state is described in the type definition";
+      type service-endpoint-status;
+    }
+
+    uses acdt:error-data {
+      description
+        "The error structure describing the error.
+
+        NOTE:
+        *** Present when service-endpoint-status is set to error. Not present otherwise ***";
+    }
+  }
+}

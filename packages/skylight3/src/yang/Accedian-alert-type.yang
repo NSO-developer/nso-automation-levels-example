@@ -1,0 +1,70 @@
+module Accedian-alert-type {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/alert/type";
+  prefix acdalt;
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "Accedian yang model Skylight Alarms.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2024-08-31 {
+    description
+      "Initial revision";
+  }
+
+  identity alert-policy {
+    description
+      "The base type identifying a Accedian alert policy";
+  }
+    
+  identity metric {
+    base alert-policy;
+    description
+      "Alerts policies based on metric values and constraints";
+  }
+
+  typedef alert-severity {
+    description
+      "Severity of the alert";
+    type enumeration {
+      enum "critical";
+      enum "major";
+      enum "minor";
+    }
+  }
+
+  typedef alert-state {
+    type enumeration {
+      enum "raised" {
+        description
+          "Alert is raised";
+      }
+      enum "cleared" {
+        description
+          "Alert is cleared";
+      }
+      enum "error" {
+        description
+          "Alert is in error";
+      }
+    }
+    description
+      "Possible states of an alert";
+  }
+}

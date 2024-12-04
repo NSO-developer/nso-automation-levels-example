@@ -1,0 +1,41 @@
+module Accedian-extensions {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/extensions";
+  prefix acdext;
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "Accedian Yang extensions definition.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-02-10 {
+    description
+      "Initial revision ";
+  }
+
+  extension tag-metadata {
+    description
+      "This extension allow to tag a leaf as a metadata element. This allow
+      the automatic configuration of the metadata in the Analytics subsystems.
+      The data is sent as metadata using a <key>:<value> pair.
+      The specified key argument will be used as the <key> in the pair.
+      The data value of the leaf containing this tag will be used as the <value>
+      in the pair";
+    argument key;
+  }
+}

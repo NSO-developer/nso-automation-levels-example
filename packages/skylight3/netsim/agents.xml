@@ -1,0 +1,30 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <service-endpoints xmlns="http://accedian.com/ns/yang/service/endpoint">
+    <service-endpoint>
+      <endpoint-id>dc0-agent</endpoint-id>
+      <endpoint-name>dc0-agent</endpoint-name>
+      <description>Datacenter</description>
+      <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:ne-endpoint</type>
+      <config>
+        <ne-config xmlns="http://accedian.com/ns/yang/service/endpoint/ne">
+          <ne-id>dc0-agent</ne-id>
+          <vlan-id>1</vlan-id>
+          <ip>10.58.244.99</ip>
+        </ne-config>
+      </config>
+    </service-endpoint>
+    <service-endpoint>
+      <endpoint-id>dc1-agent</endpoint-id>
+      <endpoint-name>dc1-agent</endpoint-name>
+      <description>dc1-agent</description>
+      <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:ne-endpoint</type>
+      <config>
+        <ne-config xmlns="http://accedian.com/ns/yang/service/endpoint/ne">
+          <ne-id>dc0-agent</ne-id>
+          <vlan-id>1</vlan-id>
+          <ip>10.58.244.99</ip>
+        </ne-config>
+      </config>
+    </service-endpoint>
+  </service-endpoints>
+</config>

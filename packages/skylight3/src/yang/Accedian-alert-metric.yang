@@ -1,0 +1,259 @@
+module Accedian-alert-metric {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/alert/metric";
+  prefix acdalmet;
+
+  import Accedian-alert {
+    prefix acdal;
+  }
+
+  import Accedian-alert-type {
+    prefix acdalt;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2024-08-31 {
+    description
+      "Initial revision";
+  }
+
+  typedef comparator {
+    description
+      "defined comparator";
+    type enumeration{
+      enum "gt" {
+        description
+          "Greater than";
+      }
+      enum "lt" {
+        description
+          "Lesser than";
+      }
+      enum "gte" {
+        description
+          "Greater than equal";
+      }
+      enum "lte" {
+        description
+          "Lesser than equal";
+      }
+    }
+  }
+
+  typedef metric-direction {
+    type enumeration {
+      enum "sd" {
+        description
+          "Source to destination: from sender to reflector";
+      }
+      enum "ds" {
+        description
+          "Destination to source: from reflector to sender";
+      }
+      enum "rt" {
+        description
+          "Round Trip: from sender to reflector then back to sender";
+      }
+    }
+  }
+
+  typedef metric-delay-type {
+    type enumeration {
+      enum "delay-avg" {
+        description
+          "Delay average per period";
+      }
+      enum "delay-stdev" {
+        description
+          "Delay standard deviation per period";
+      }
+      enum "delay-max" {
+        description
+          "Maximum delay per period";
+      }
+      enum "delay-var-avg" {
+        description
+          "Average delay variation during the period";
+      }
+      enum "delay-p95" {
+        description
+          "Delay 95th percentile per period";
+      }
+      enum "delay-p25" {
+        description
+          "Delay 25th percentile per period";
+      }
+    }
+  }
+
+  typedef metric-packetloss-type {
+    type enumeration {
+      enum "packets-lost-pct" {
+        description
+          "Packetloss ratio in percentage";
+      }
+      enum "packets-lost" {
+        description
+          "Total number of loss packets";
+      }
+    }
+  }
+
+  typedef metric-type {
+    type union {
+      type metric-delay-type;
+      type metric-packetloss-type;
+    }
+  }
+
+  grouping alert-condition {
+    leaf threshold {
+      type decimal64 {
+        fraction-digits 6;
+      }
+      description
+        "The value used as a threshold to trigger an
+        alert. This value will be used in combination
+        of the other condition parameters to determine
+        to generate an alert or not";
+    }
+    leaf comparator {
+      type comparator;
+      description
+        "The comparator operator to use for this
+        alert condition";
+    }
+
+    leaf duration-sec {
+      type uint32;
+      default 60;
+      description
+        "Metric period duration in seconds.
+        The period must not be lower than
+        the measured sampling period";
+    }
+
+    leaf ratio {
+      type uint8 {
+        range "0..100";
+      }
+      default 100;
+      description
+        "Ratio in percent of the amount of values
+        meeting the condition to raise the alert";
+    }
+  }
+
+  augment "/acdal:alert-policies/acdal:alert-policy/acdal:policy" {
+    when "derived-from-or-self(/acdal:alert-policies/acdal:alert-policy/acdal:policy-type, 'acdalt:metric')";
+    description
+      "Augment the alerts with a conditional policy that allow to trigger
+      an alert based on specific conditions applied to metric based data";
+
+    container metric-policy {
+      list conditions {
+        key condition-id;
+        // ODL issue: min-elements is not supported when using augment with when statement
+        // min-elements 1;
+        description
+          "A list of 1..N conditions configured under this policy.
+          When needed, more than one condition can be grouped under
+          the same policy to implement in a single policy a common
+          use case.";
+
+        leaf condition-id {
+          type string;
+          description
+            "An user configurable ID used to identify each condition";
+        }
+
+        leaf metric-type {
+          type acdalmet:metric-type;
+          description
+            "The type of the metric on which this condition will apply";
+        }
+
+        leaf alert-direction {
+          type acdalmet:metric-direction;
+          description
+            "The traffic direction monitored by this condition";
+        }
+
+        leaf alert-severity {
+          type acdalt:alert-severity;
+          description
+            "The severity of this alert condition. This severity
+            will be passed back as-is to the yang client through
+            the alert-notifications";
+        }
+
+        container triggers-on {
+          uses alert-condition;
+          description
+            "Used to determine under which condition the
+            alert will be raised";
+        }
+
+        container recovers-on {
+          uses alert-condition;
+          description
+            "Used to specify a user-defined condition under which the
+            alert will be cleared.
+
+            If a user-defined condition is not provided, the alert will
+            be cleared by default on the reverse of the alarm condition.
+            For example:
+            alert condition: >= 500 usec
+            Default recovery condition: < 500 usec";
+        }
+      }
+    }
+  }
+
+  augment "/acdal:alert-notification/acdal:alert-data" {
+    description
+      "Augment the alert notification with the alert data with the alert
+      metric type";
+
+    container metric {
+
+      leaf type {
+        type acdalmet:metric-type;
+        description
+          "Metric type generating the alert";
+      }
+
+      leaf direction {
+        type acdalmet:metric-direction;
+        description
+          "Indicates the direction of the metric triggering the alert";
+      }
+
+      leaf value {
+        type string;
+        description
+          "The value triggering the alert condition.
+          The type of the value depends on the metric type";
+      }
+    }
+  }
+}

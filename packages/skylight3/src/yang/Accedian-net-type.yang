@@ -1,0 +1,163 @@
+module Accedian-net-type {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/types/net";
+  prefix acdnt;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "Accedian yang model for inet types.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-11-24 {
+    description
+      "Initial revision";
+  }
+
+  typedef logical-port {
+    type string;
+  }
+
+  typedef transport-type {
+    description
+      "OSI Model layer";
+    type enumeration {
+      enum "layer2" {
+        description
+          "OSI Model Data Link Layer";
+      }
+      enum "layer3" {
+        description
+          "OSI Model Network Layer";
+      }
+    }
+  }
+
+  typedef vlan-id {
+    description
+      "A 12-bit field specifying the VLAN identifier of the frame. Values 0 and 4095 are reserved";
+    type uint16 {
+      range "1..4094";
+    }
+  }
+
+  typedef vlan-tpid {
+    description
+      "Tag Protocol Identifier. Valid TPID are enumerated below";
+    type enumeration {
+      enum "0x8100" {
+        description
+          "TPID value for 802.1q single-tagged VLANs.";
+      }
+      enum "0x88a8" {
+        description
+          "TPID value for 802.1ad provider bridging, Q-in-Q,
+          or stacked VLANs";
+      }
+      enum "0x9100" {
+        description
+          "Alternate TPID value";
+      }
+    }
+    default "0x8100";
+  }
+
+  typedef vlan-cfi {
+    description
+      "A 1 bit field indicating a DEI/CFI value";
+    type uint8 {
+      range "0..1";
+    }
+    default 0;
+  }
+
+  typedef vlan-prio {
+    description
+      "A 3 bits field indicating the frame priority level";
+    type uint8 {
+      range "0..7";
+    }
+    default 0;
+  }
+
+  typedef source-port-number {
+    type union {
+      type inet:port-number;
+      type enumeration {
+        enum autoallocate {
+          description
+            "Indicates that the source port will be
+            auto-allocated from the dynamic port range.";
+        }
+      }
+    }
+    default "autoallocate";
+    description
+      "Represents the source port number of an Internet transport-layer
+      protocol. It allow to specify 'autoallocate' value when the source
+      port should not specified explicitly but auto selected from the
+      dynamic port range";
+  }
+
+  typedef dscp {
+    type inet:dscp;
+    default 0;
+    description
+      "The DSCP value present in the IP header of the packets";
+  }
+
+  typedef ttl {
+    type uint8 {
+      range "0..255";
+    }
+    default 255;
+    description
+      "The Time To Live value present in the IP header of
+      the packet";
+  }
+
+  typedef y1731-meg-level {
+    type uint8 {
+      range "0..7";
+    }
+    default 7;
+    description
+      "Y.1731 Maintenance Entity Group level";
+  }
+
+  grouping vlan-config {
+    description
+      "The configuration parameters of a VLAN";
+    leaf id {
+      type vlan-id;
+      mandatory true;
+    }
+    leaf tpid {
+      type vlan-tpid;
+    }
+    leaf cfi {
+      type vlan-cfi;
+    }
+    leaf prio {
+      type vlan-prio;
+    }
+  }
+}

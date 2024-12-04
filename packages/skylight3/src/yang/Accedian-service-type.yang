@@ -1,0 +1,37 @@
+module Accedian-service-type {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/service/type";
+  prefix acdservt;
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module specifies the data types involved in the service definition.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-02-10 {
+    description
+      "Initial revision";
+  }
+
+  identity service {
+    description
+      "The base type identifying a Accedian service";
+  }
+
+  // Service sub-identities not implemented yet as per this initial revision.
+}

@@ -1,0 +1,86 @@
+module Accedian-type {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/types";
+  prefix acdt;
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "Accedian yang model common types.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-11-24 {
+    description
+      "Change the string pattern of the type id to add the support for the period (.) character.
+      Remove the escaping of the hyphen. Escaping hyphen in a char block is not needed";
+  }
+
+  revision 2023-04-06 {
+    description
+      "Change the string pattern of the type id to add the support for the hyphen (-) character.
+      Remove the limitation that prevents the ID from starting with a number.";
+  }
+
+  revision 2023-02-10 {
+    description
+      "Initial revision";
+  }
+
+  typedef id {
+    type string {
+      length "1..128";
+      pattern '[a-zA-Z0-9][a-zA-Z0-9._-]*';
+    }
+    description
+      "An identifier type.
+      It is composed of case sensitive ASCII characters.
+      The format starts with a letter or a number as a
+      first character followed by 0 to 127 letter, numbers,
+      underscores and hyphens";
+  }
+
+  typedef error-tag {
+    description
+      "A tag specifying the error category";
+    type string;
+  }
+
+  grouping error-data {
+    container errors {
+      config false;
+      description
+        "Non-configuration error data to be retrived as part of state/status data or
+        received through notifications";
+
+      list error {
+        description
+          "List of current errors. More than one error could be present. This list doesn't
+          require a key since it's not configuration data";
+        leaf tag {
+          description
+            "The category of the error";
+          type error-tag;
+        }
+        leaf msg {
+          type string;
+          description
+            "Human readable message describing the nature/source of the error";
+        }
+      }
+    }
+  }
+}

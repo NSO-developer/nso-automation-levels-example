@@ -1,0 +1,476 @@
+module Accedian-session-rfc2544 {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/session/sat/rfc2544";
+  prefix acdsr;
+
+  import ietf-yang-types {
+    prefix yang;
+  }
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import Accedian-net-type {
+    prefix acdnt;
+  }
+
+  import Accedian-session {
+    prefix acdses;
+  }
+
+  import Accedian-session-type {
+    prefix acdstype;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the definition for the RFC 2544 protocol.
+
+    You can use the RFC 2544 traffic sender to create a flow of test traffic and produce test results. The traffic
+    sender allows you to set characteristics, such as the traffic type and bit rate, when you define a
+    flow. You can also set the following parameters when setting up a traffic flow:
+
+    Traffic Type: Layer 2, Layer 3 or IP multicast traffic.
+    Test Traffic Encapsulation Type: VLAN or VLAN-in-VLAN
+    Frame/Packet Sizes: All sizes defined in the RFC-2544 standard, plus Jumbo
+
+    See the RFC-2544 standard for a definition of all parameters and tests.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2024-08-31 {
+    description
+      "Initial revision";
+  }
+
+  typedef frame-size {
+    description
+      "Frame size. Can be expressed in number of bytes
+      or by specifying the string 'jumbo' to specify a
+      jumbo frame size. The actual jumbo size is configured
+      through the the value of the test-config:jumbo-frame-size
+      field.
+      Note: When used with IPv6, a frame-size of 64 is invalid";
+    type union {
+      type uint16 {
+        range "64 | 128 | 256 | 512 | 1024 | 1280 | 1518";
+      }
+      type enumeration {
+        enum "jumbo" {
+          description
+            "A jumbo frame size. See frame-size description";
+        }
+      }
+    }
+  }
+
+  typedef step-size {
+    type uint16 {
+      range "1..5000";
+    }
+    units megabits-per-second;
+    default 5;
+    description
+      "Granularity of the min-max range.
+      Note: The step-size config must be smaller or equal to the
+      maximum-rate value. For example, a 5000 Mbps (5Gbps) step size
+      will return a configuration error on a 1Gbps port/device";
+  }
+
+  typedef duration-sec {
+    type uint16 {
+      range "1..1800";
+    }
+    units seconds;
+    default 60;
+    description
+      "Duration of the test";
+  }
+
+  typedef duration-msec {
+    type uint16 {
+      range "1..10000";
+    }
+    units milliseconds;
+    default 2000;
+    description
+      "Duration of the test";
+  }
+
+  typedef frameloss {
+    type uint16 {
+      range "0..999";
+    }
+    units percentage;
+    default 0;
+    description
+      "Acceptable difference between measured frame
+      The value is in increments of 0.1% (0.0% to 99.9%)";
+  }
+
+  augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:rfc2544')";
+    description
+      "Augment the service session protocol of Accedian-service-session with SAT RFC2544
+      config data";
+
+    container rfc2544 {
+      description
+        "Configuration data and reports for the RFC2544 SAT protocol";
+
+      leaf transport-type {
+        type acdnt:transport-type;
+        default layer3;
+        description
+          "Session transport type";
+      }
+
+      container session-sender {
+        description
+          "Configuration data for the RFC2544 sender";
+
+        leaf admin-state {
+          type boolean;
+          default false;
+          description
+            "Indicates whether the associated session
+            endpoint is operating as a RFC2544 packet
+            sender";
+        }
+
+        leaf outgoing-port-name {
+          type acdnt:logical-port;
+          description
+            "Session sender outgoing interface. Depending
+            on the platform this could be a physical port name
+            or a NFV-interface/virtual-connection name";
+        }
+
+        container layer2 {
+          when "../../transport-type = 'layer2'";
+
+          leaf y1731-meg-level {
+            type acdnt:y1731-meg-level;
+            description
+              "Y.1731 Maintenance Entity Group level";
+          }
+        }
+
+        container layer3 {
+          when "../../transport-type = 'layer3'";
+
+          leaf source-udp-port {
+            type acdnt:source-port-number;
+            mandatory true;
+            description
+              "The UDP port number that is to be used by
+              the sender for this RFC2544 session";
+          }
+
+          leaf dscp {
+            type acdnt:dscp;
+            description
+              "The DSCP value present in the IP header of the
+              RFC2544 Test Layer-3 packets";
+          }
+
+          leaf ttl {
+            type acdnt:ttl;
+            description
+              "The Time To Live value present in the IP header of
+              the RFC2544 Test Layer-3 packets";
+          }
+        }
+
+        container vlan-1 {
+          presence "Present when tagging a single vlan or when tagging an inner vlan in a vlan-in-vlan configuration.";
+          uses acdnt:vlan-config;
+          description
+            "Inner VLAN configuration";
+        }
+
+        container vlan-2 {
+          presence "Present when tagging an outer vlan in a vlan-in-vlan configuration.";
+          must "../vlan-1" { error-message "vlan-2 can only be configured if vlan-1 is also configured."; }
+          uses acdnt:vlan-config;
+          description
+            "Outer VLAN configuration";
+        }
+
+        container test-config {
+          description
+            "Test configuration data";
+
+          leaf jumbo-frame-size {
+            type uint16 {
+              range "64..10240";
+            }
+            units bytes;
+            default 2000;
+            description
+              "Size of the jumbo frames";
+          }
+
+          leaf binary-duration {
+            type uint8 {
+              range "1..10";
+            }
+            units seconds;
+            default 2;
+            description
+              "Duration of each trial during the binary search for the maximum
+              throughput";
+          }
+
+          leaf strict-failure {
+            type boolean;
+            default false;
+            description
+              "When set to true, the test will fail on duplicates or out of order packets";
+          }
+
+          leaf exclude-vlan-size {
+            type boolean;
+            default false;
+            description
+              "When set to true, the frame length is increased by the size of the VLAN tag
+              header(s) being added to the frame";
+          }
+
+          container throughput {
+            description
+              "Throughput test settings";
+
+            leaf step-size {
+              type step-size;
+              description
+                "Throughput step size during the test";
+            }
+
+            leaf minimum-rate {
+              type uint16 {
+                range "1..10000";
+              }
+              units megabits-per-second;
+              default 1;
+              description
+                "Minimum rate.
+                Note: the minimum rate must be smaller than maximum-rate";
+            }
+            leaf maximum-rate {
+              type uint16 {
+                range "1..10000";
+              }
+              units megabits-per-second;
+              default 100;
+              description
+                "Maximum rate.
+                Note: The maximum-rate config must be smaller or equal to the
+                maximal physical port speed used for the RFC2544 test. For
+                example, a speed of 10000 (10Gbps) will return an config error
+                on 1Gbps ports/devices";
+            }
+
+            leaf fine-stepping {
+              type boolean;
+              default false;
+              description
+                "Enable fine stepping in case of low bandwidth testing (below
+                12Mbps)";
+            }
+
+            leaf duration {
+              type duration-sec;
+              default 60;
+              description
+                "Duration of the test";
+            }
+
+            leaf frameloss {
+              type frameloss;
+              description
+                "See frameloss type description";
+            }
+
+            leaf-list frame-size {
+              type frame-size;
+              max-elements 8;
+              default 128;
+              description
+                "Frame sizes to use. Any combination of elements
+                specified in the type frame-size is valid.
+                Note: When used with IPv6, a frame-size of 64 is invalid";
+            }
+          }
+
+          container frameloss {
+            description
+              "Frameloss test settings";
+
+            leaf duration {
+              type duration-sec;
+              default 10;
+              description
+                "Duration of the test";
+            }
+
+            leaf-list frame-size {
+              type frame-size;
+              max-elements 8;
+              default 128;
+              description
+                "Frame sizes to use. Any combination of elements
+                specified in the type frame-size is valid.
+                Note: When used with IPv6, a frame-size of 64 is invalid";
+            }
+
+            leaf step-size {
+              type step-size;
+              description
+                "Throughput step size during the test";
+            }
+          }
+
+          container delay-variation {
+            description
+              "Delay and delay variation test settings";
+
+            leaf duration {
+              type duration-sec;
+              default 120;
+              description
+                "Duration of the test";
+            }
+
+            leaf frameloss {
+              type frameloss;
+              description
+                "Acceptable difference between measured frame loss (0.1%)";
+            }
+
+            leaf-list frame-size {
+              type frame-size;
+              max-elements 8;
+              default 128;
+              description
+                "Frame sizes to use. Any combination of elements
+                specified in the type frame-size is valid.
+                Note: When used with IPv6, a frame-size of 64 is invalid";
+            }
+          }
+
+          container back-to-back {
+            description
+              "Back-to-back test settings";
+
+            leaf-list frame-size {
+              type frame-size;
+              max-elements 8;
+              default 128;
+              description
+                "Frame sizes to use. Any combination of elements
+                specified in the type frame-size is valid.
+                Note: When used with IPv6, a frame-size of 64 is invalid";
+            }
+
+            leaf repeat {
+              type uint8 {
+                range "1..100";
+              }
+              default 50;
+              description
+                "Number of bursts to perform for each packet size";
+            }
+
+            leaf duration {
+              type duration-msec;
+              default 2000;
+              description
+                "Duration of the test";
+            }
+          }
+        }
+      }
+
+      container session-reflector {
+        description
+          "Configuration data for the RFC2544 reflector";
+
+        leaf admin-state {
+          type boolean;
+          default false;
+          description
+            "Indicates whether the session endpoint is
+            operating as a RFC2544 reflector";
+        }
+
+        container layer2 {
+          when "../../transport-type = 'layer2'";
+
+          leaf mac-address {
+            type yang:mac-address;
+            description
+              "The reflector MAC address";
+          }
+        }
+
+        container layer3 {
+          when "../../transport-type = 'layer3'";
+
+          leaf ip {
+            type inet:ip-address;
+            mandatory true;
+            description
+              "The IPv4 or IPv6 reflector address";
+          }
+
+          leaf destination-udp-port {
+            type inet:port-number;
+            mandatory true;
+            description
+              "This parameter defines the destination UDP port number
+              expected by the reflector for this Layer-3 SAT session";
+          }
+
+          leaf two-way-loopback {
+            type boolean;
+            default false;
+            description
+              "When set to true, enable Layer-3 two-way loopback tests in the reflector";
+          }
+        }
+      }
+
+      container reports {
+        config false;
+        description
+          "Status data related to RFC2544 generated reports";
+
+        leaf-list available-reports {
+          type string;
+          description
+            "Returns the list of reports available from current
+            and past RFC2544 tests.
+            Reports can be fetched and managed through the RPCs
+            defined in the Accedian-sat module";
+        }
+      }
+    }
+  }
+}
+

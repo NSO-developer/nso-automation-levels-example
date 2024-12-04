@@ -1,0 +1,51 @@
+module Accedian-service-endpoint-unmanaged {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/service/endpoint/unmanaged";
+  prefix acdsepunmg;
+
+  import Accedian-service-endpoint-type {
+    prefix acdsept;
+  }
+
+  import Accedian-service-endpoint {
+    prefix acdsep;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the definition of a unmanaged endpoint
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-11-24 {
+    description
+      "Initial revision";
+  }
+
+  augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:config" {
+    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type, 'acdsept:unmanaged-endpoint')" {
+      description
+        "Unmanaged service-endpoint definition";
+    }
+
+    container unmanaged-config {
+      description
+        "This config is left empty. It is used to represent an endpoint that is not configured and managed
+        by this yang model. For example, a third party reflector";
+    }
+  }
+}
