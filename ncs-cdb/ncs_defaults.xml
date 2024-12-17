@@ -6,12 +6,6 @@
       <stdout-capture>
         <file>./logs/ncs-java-vm.log</file>
       </stdout-capture>
-      <jmx>
-        <jndi-address>127.0.0.1</jndi-address>
-        <jndi-port>9902</jndi-port>
-        <jmx-address>127.0.0.1</jmx-address>
-        <jmx-port>9901</jmx-port>
-      </jmx>
   </java-vm>
 
   <smart-license>
