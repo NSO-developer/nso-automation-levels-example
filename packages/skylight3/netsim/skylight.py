@@ -22,7 +22,8 @@ from ncs.dp import Action, Daemon
 from ncs.maapi import Maapi
 from ncs.log import Log
 
-from skylight_netsim_ns import ns
+from Accedian_alert_ns import ns
+from Accedian_alert_type_ns import ns as ns_type
 
 xmltag = _ncs.XmlTag
 value = _ncs.Value
@@ -65,21 +66,56 @@ class NotificationDaemon:
     def send(self, device, jitter):
         values = [
             tagvalue(xmltag(ns.hash,
-                            ns.skylight_netsim_skylight_event),
-                     value((ns.skylight_netsim_skylight_event, ns.hash),
+                            ns.acdal_alert_notification),
+                     value((ns.acdal_alert_notification, ns.hash),
                            _ncs.C_XMLBEGIN)
                      ),
             tagvalue(xmltag(ns.hash,
-                            ns.skylight_netsim_device),
+                            ns.acdal_policy_id),
                      value(device, _ncs.C_BUF)),
 
             tagvalue(xmltag(ns.hash,
-                            ns.skylight_netsim_jitter),
-                     value((jitter, 3), _ncs.C_DECIMAL64)),
+                            ns.acdal_condition_id),
+                     value('delay-variation', _ncs.C_BUF)),
 
             tagvalue(xmltag(ns.hash,
-                            ns.skylight_netsim_skylight_event),
-                     value((ns.skylight_netsim_skylight_event, ns.hash),
+                            ns.acdal_session_id),
+                     value('session-id-value', _ncs.C_BUF)),
+
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_service),
+                     value((ns.acdal_service, ns.hash),
+                           _ncs.C_XMLBEGIN)
+                     ),
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_service_id),
+                     value('service-id-value', _ncs.C_BUF)),
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_group_id),
+                     value('group-id-value', _ncs.C_BUF)),
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_service),
+                     value((ns.acdal_service, ns.hash),
+                           _ncs.C_XMLEND)),
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_alert_state),
+                     value(ns_type.acdalt_raised, _ncs.C_ENUM_VALUE)),
+            # tagvalue(xmltag(ns.hash,
+            #                 ns.timestamp),
+            #          value(datetime_value, _ncs.C_DATETIME)),
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_alert_severity),
+                     value(ns_type.acdalt_critical, _ncs.C_ENUM_VALUE)),
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_alert_type),
+                     value((ns_type.hash, ns_type.acdalt_metric), _ncs.C_IDENTITYREF)),
+            # alert-data {
+
+            # }
+
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_alert_notification),
+                     value((ns.acdal_alert_notification, ns.hash),
                            _ncs.C_XMLEND)
                      )
         ]
@@ -108,7 +144,7 @@ def load_schemas():
 
 if __name__ == "__main__":
     logger = logging.getLogger('skylight-netsim')
-    logging.basicConfig(filename='skylight-netsim.log',
+    logging.basicConfig(filename='logs/skylight-netsim.log',
               format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
               level=logging.DEBUG)
 
