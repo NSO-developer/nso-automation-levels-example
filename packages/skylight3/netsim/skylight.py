@@ -125,7 +125,7 @@ if __name__ == "__main__":
                        actionpoint='skylight-send-notification', log=log))
 
     notif_daemon = NotificationDaemon("skylight-notification-daemon",
-                                        "skylight-events")
+                                        "notification-stream")
     daemons.append(notif_daemon)
 
     log.info('--- Daemon Skylight Netsim STARTED ---')
