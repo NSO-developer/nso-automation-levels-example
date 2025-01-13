@@ -6,7 +6,7 @@ include $(NCS_DIR)/src/ncs/build/include.netsim.mk
 XML = $(wildcard *.xml)
 XML += $(NCS_DIR)/netsim/confd/var/confd/cdb/aaa_init.xml
 
-EXTRA_FILES = confd.conf.netsim agents.xml skylight.py skylight_netsim_ns.py
+EXTRA_FILES = confd.conf.netsim endpoints.xml skylight.py skylight_netsim_ns.py
 
 YANG = $(wildcard ../src/yang/*.yang)
 SUBMODULES          = $(shell grep -l belongs-to ../src/yang/*.yang \
