@@ -1,4 +1,6 @@
 #!/bin/sh
+. ./env.sh 
+#!/bin/sh
 
 # The following variables will be set before this script
 # is invoked.
@@ -26,7 +28,8 @@ env sname=${NAME} ${CONFD} -c ${NAME}.conf ${CONFD_FLAGS} \
     --addloadpath ${CONFD_DIR}/etc/confd
 ret=$?
 
-NCS_IPC_PORT=$CONFD_IPC_PORT python3 skylight.py&
+ln -sf skylight.py ${NAME}.py
+NCS_IPC_PORT=$CONFD_IPC_PORT python3 ${NAME}.py&
 
 if [ ! $first_time = 0 ]; then
    true;
