@@ -31,7 +31,7 @@
               </session-protocol>
             </service-endpoints>
 
-            <!-- Endpoint located at vpn endpoint -->
+            <!-- Endpoint located at edge -->
             <service-endpoints>
               <endpoint-id>{$EDGE}-twamp</endpoint-id>
               <session-protocol>
@@ -58,6 +58,35 @@
             </metadata>
           </session>
         </sessions>
+
+        <!-- Alert policy -->
+        <alert-policies xmlns="http://accedian.com/ns/yang/alert">
+          <alert-policy>
+            <policy-id>{$EDGE}</policy-id>
+            <policy-name>{$EDGE}</policy-name>
+            <policy-type xmlns:acdalt="http://accedian.com/ns/yang/alert/type">acdalt:metric</policy-type>
+            <policy>
+              <metric-policy xmlns="http://accedian.com/ns/yang/alert/metric">
+                <conditions>
+                  <condition-id>condition-1</condition-id>
+                  <metric-type>delay-max</metric-type>
+                  <alert-direction>ds</alert-direction>
+                  <alert-severity>critical</alert-severity>
+                  <triggers-on>
+                    <threshold>4000</threshold>
+                    <comparator>gte</comparator>
+                  </triggers-on>
+                  <recovers-on>
+                    <threshold>4000</threshold>
+                    <comparator>lt</comparator>
+                  </recovers-on>
+                </conditions>
+              </metric-policy>
+            </policy>
+          </alert-policy>
+        </alert-policies>
+
+        <!-- Service -->
         <services xmlns="http://accedian.com/ns/yang/service">
           <service>
             <service-id>{$SERVICE_NAME}</service-id>
@@ -66,9 +95,9 @@
             <sessions>
               <session-id>{$SESSION_ID}</session-id>
             </sessions>
-            <!--alerts>
-              <alert-policy-id>{$ALERT_ID}</alert-policy-id>
-            </alerts-->
+            <alerts>
+              <alert-policy-id>{$EDGE}</alert-policy-id>
+            </alerts>
           </service>
         </services>
       </config>
