@@ -6,7 +6,7 @@ include $(NCS_DIR)/src/ncs/build/include.netsim.mk
 XML = $(wildcard *.xml)
 XML += $(NCS_DIR)/netsim/confd/var/confd/cdb/aaa_init.xml
 
-EXTRA_FILES = confd.conf.netsim endpoints.xml skylight.py Accedian_alert_ns.py \
+EXTRA_FILES = confd.conf.netsim endpoints.xml daemon.py Accedian_alert_ns.py \
 	      Accedian_alert_type_ns.py Accedian_alert_metric_ns.py
 
 YANG = $(wildcard ../src/yang/*.yang)

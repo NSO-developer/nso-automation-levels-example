@@ -28,8 +28,8 @@ env sname=${NAME} ${CONFD} -c ${NAME}.conf ${CONFD_FLAGS} \
     --addloadpath ${CONFD_DIR}/etc/confd
 ret=$?
 
-ln -sf skylight.py ${NAME}.py
-NCS_IPC_PORT=$CONFD_IPC_PORT python3 ${NAME}.py&
+ln -sf daemon.py ${NAME}-daemon.py
+NCS_IPC_PORT=$CONFD_IPC_PORT python3 ${NAME}-daemon.py&
 
 if [ ! $first_time = 0 ]; then
    true;

@@ -1,0 +1,10 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <metadata-config xmlns="http://accedian.com/ns/yang/metadata">
+    <metadata-key>
+      <key-name>access_type</key-name>
+    </metadata-key>
+    <metadata-key>
+      <key-name>region</key-name>
+    </metadata-key>
+  </metadata-config>
+</config>
