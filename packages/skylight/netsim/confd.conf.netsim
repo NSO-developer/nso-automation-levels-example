@@ -180,8 +180,8 @@
   <notifications>
     <eventStreams>
       <stream>
-        <name>skylight-events</name>
-        <description>Skylight event stream</description>
+        <name>notification-stream</name>
+        <description>Skylight notification stream</description>
         <replaySupport>false</replaySupport>
       </stream>
     </eventStreams>

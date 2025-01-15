@@ -1,2 +1,2 @@
-pkill -f skylight.py
+pkill -f ${NAME}.py
 pkill -KILL -f ${NAME}.conf

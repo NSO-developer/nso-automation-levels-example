@@ -4,32 +4,73 @@
                  state="streaming:connected-to-skylight">
   <?set EDGE = {./name}?>
   <?set DC = {./dc}?>
-  <?set SESSION_ID = "851d1691-aba9-80a9-cc55-0a0c1219ba16"?>
+  <?set SESSION_ID = {./name}-connected-to-skylight?>
+  <?set SERVICE_NAME = {./name}-connected-to-skylight?>
   <?set-root-node {/}?>
   <devices xmlns="http://tail-f.com/ns/ncs">
     <device>
       <name>skylight</name>
       <config>
-        <sessions xmlns="urn:accedian:params:xml:ns:yang:accedian-gateway-orchestrator">
+        <sessions xmlns="http://accedian.com/ns/yang/session">
           <session>
-            <sessionIdentifier>{$SESSION_ID}</sessionIdentifier>
-            <orchestratorType>agent</orchestratorType>
-            <sessiontype>twamp</sessiontype>
-            <ifStateful>true</ifStateful>
-            <agent>
-              <agentId>{/streaming:dc[streaming:name=$DC]/streaming:skylight-agent-id}</agentId>
-              <agentSessionName>{$DC}-agent-to-{$EDGE}-twamp</agentSessionName>
-              <enable>true</enable>
-              <period>continuous</period>
-            </agent>
-            <twamp>
-              <senderDscp>0</senderDscp>
-              <reflectorAddr>{/ncs:devices/ncs:device[ncs:name=$EDGE]/ncs:address}</reflectorAddr>
-              <reflectorPort>4000</reflectorPort>
-              <reportInterval>31</reportInterval>
-            </twamp>
+            <session-id>{$SESSION_ID}</session-id>
+            <session-name>{$SESSION_ID}</session-name>
+            <description>{$EDGE} connected to skylight</description>
+            <session-type xmlns:acdst="http://accedian.com/ns/yang/session/type">acdst:twamp-light</session-type>
+
+            <!-- Endpoint located in datacenter -->
+            <service-endpoints>
+              <endpoint-id>{$DC}-agent</endpoint-id>
+              <session-protocol>
+                <twamp-light xmlns="http://accedian.com/ns/yang/session/twamp/light">
+                  <session-sender>
+                    <admin-state>true</admin-state>
+                    <reflector-udp-port>862</reflector-udp-port>
+                  </session-sender>
+                </twamp-light>
+              </session-protocol>
+            </service-endpoints>
+
+            <!-- Endpoint located at vpn endpoint -->
+            <service-endpoints>
+              <endpoint-id>{$EDGE}-twamp</endpoint-id>
+              <session-protocol>
+                <twamp-light xmlns="http://accedian.com/ns/yang/session/twamp/light">
+                  <session-reflector>
+                    <admin-state>true</admin-state>
+                    <reflector-udp-port>862</reflector-udp-port>
+                    <mode>stateful</mode>
+                  </session-reflector>
+                </twamp-light>
+              </session-protocol>
+            </service-endpoints>
+
+            <!-- Meta data -->
+            <metadata>
+              <key-value>
+                <key-name>region</key-name>
+                <value>Nordic</value>
+              </key-value>
+              <key-value>
+                <key-name>access_type</key-name>
+                <value>Fiber</value>
+              </key-value>
+            </metadata>
           </session>
         </sessions>
+        <services xmlns="http://accedian.com/ns/yang/service">
+          <service>
+            <service-id>{$SERVICE_NAME}</service-id>
+            <service-name>{$SERVICE_NAME}</service-name>
+            <description>{$SERVICE_NAME}</description>
+            <sessions>
+              <session-id>{$SESSION_ID}</session-id>
+            </sessions>
+            <!--alerts>
+              <alert-policy-id>{$ALERT_ID}</alert-policy-id>
+            </alerts-->
+          </service>
+        </services>
       </config>
     </device>
   </devices>

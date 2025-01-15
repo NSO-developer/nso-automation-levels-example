@@ -5,7 +5,7 @@
       <notifications>
         <subscription>
           <name>skylight-events</name>
-          <stream>skylight-events</stream>
+          <stream>notification-stream</stream>
           <local-user>admin</local-user>
           <reconnect-interval>10</reconnect-interval>
         </subscription>

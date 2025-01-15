@@ -22,7 +22,9 @@ from ncs.dp import Action, Daemon
 from ncs.maapi import Maapi
 from ncs.log import Log
 
-from skylight_netsim_ns import ns
+from Accedian_alert_ns import ns
+from Accedian_alert_type_ns import ns as ns_type
+from Accedian_alert_metric_ns import ns as ns_metric
 
 xmltag = _ncs.XmlTag
 value = _ncs.Value
@@ -62,24 +64,94 @@ class NotificationDaemon:
     def join(self):
         self.ndaemon.join()
 
-    def send(self, device, jitter):
+    def send(self, device, jitter, high=False):
+        state = ns_type.acdalt_raised if high else ns_type.acdalt_cleared
+
         values = [
             tagvalue(xmltag(ns.hash,
-                            ns.skylight_netsim_skylight_event),
-                     value((ns.skylight_netsim_skylight_event, ns.hash),
+                            ns.acdal_alert_notification),
+                     value((ns.acdal_alert_notification, ns.hash),
                            _ncs.C_XMLBEGIN)
                      ),
             tagvalue(xmltag(ns.hash,
-                            ns.skylight_netsim_device),
+                            ns.acdal_policy_id),
                      value(device, _ncs.C_BUF)),
 
             tagvalue(xmltag(ns.hash,
-                            ns.skylight_netsim_jitter),
-                     value((jitter, 3), _ncs.C_DECIMAL64)),
+                            ns.acdal_condition_id),
+                     value('delay-variation', _ncs.C_BUF)),
 
             tagvalue(xmltag(ns.hash,
-                            ns.skylight_netsim_skylight_event),
-                     value((ns.skylight_netsim_skylight_event, ns.hash),
+                            ns.acdal_session_id),
+                     value('session-id-value', _ncs.C_BUF)),
+
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_service),
+                     value((ns.acdal_service, ns.hash),
+                           _ncs.C_XMLBEGIN)
+                     ),
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_service_id),
+                     value('service-id-value', _ncs.C_BUF)),
+                     
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_group_id),
+                     value('group-id-value', _ncs.C_BUF)),
+
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_service),
+                     value((ns.acdal_service, ns.hash),
+                           _ncs.C_XMLEND)),
+            
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_alert_state),
+                     value(state, _ncs.C_ENUM_VALUE)),
+
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_alert_severity),
+                     value(ns_type.acdalt_critical, _ncs.C_ENUM_VALUE)),
+
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_alert_type),
+                     value((ns_type.hash, ns_type.acdalt_metric), _ncs.C_IDENTITYREF)),
+         
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_alert_data),
+                     value((ns.acdal_alert_data, ns.hash),
+                           _ncs.C_XMLBEGIN)),
+
+            tagvalue(xmltag(ns_metric.hash,
+                            ns_metric.acdalmet_metric),
+                     value((ns_metric.acdalmet_metric, ns_metric.hash),
+                           _ncs.C_XMLBEGIN)),
+
+            # Delay variation average metric
+            tagvalue(xmltag(ns_metric.hash,
+                            ns_metric.acdalmet_type),
+                     value(ns_metric.acdalmet_delay_var_avg, _ncs.C_ENUM_VALUE)),
+
+            # Direction from source to destination
+            tagvalue(xmltag(ns_metric.hash,
+                            ns_metric.acdalmet_direction),
+                     value(ns_metric.acdalmet_sd, _ncs.C_ENUM_VALUE)),
+
+            tagvalue(xmltag(ns_metric.hash,
+                            ns_metric.acdalmet_value),
+                     value(str(jitter), _ncs.C_BUF)),
+
+            tagvalue(xmltag(ns_metric.hash,
+                            ns_metric.acdalmet_metric),
+                     value((ns_metric.acdalmet_metric, ns_metric.hash),
+                           _ncs.C_XMLEND)),
+
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_alert_data),
+                     value((ns.acdal_alert_data, ns.hash),
+                           _ncs.C_XMLEND)),
+
+            tagvalue(xmltag(ns.hash,
+                            ns.acdal_alert_notification),
+                     value((ns.acdal_alert_notification, ns.hash),
                            _ncs.C_XMLEND)
                      )
         ]
@@ -89,15 +161,18 @@ class NotificationDaemon:
 class SendNotificationAction(Action):
     @Action.rpc
     def cb_action(self, uinfo, name, input, output):
+        jitter = None
         if input.jitter:
             jitter = int(float(input.jitter)*1000)
-        elif name == "send-notification-high-jitter":
-            jitter = random.randint(5000, 8000)
+        if name == "send-notification-high-jitter":
+            jitter = jitter or random.randint(5000, 8000)
+            high = True
         else:
-            jitter = random.randint(1000, 3000)
+            jitter = jitter or random.randint(1000, 3000)
+            high = False
 
         if notif_daemon is not None:
-            notif_daemon.send(input.device, jitter)
+            notif_daemon.send(input.device, jitter, high)
             self.log.info("Notification sent")
 
 
@@ -108,7 +183,7 @@ def load_schemas():
 
 if __name__ == "__main__":
     logger = logging.getLogger('skylight-netsim')
-    logging.basicConfig(filename='skylight-netsim.log',
+    logging.basicConfig(filename='logs/skylight-netsim.log',
               format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
               level=logging.DEBUG)
 
@@ -125,7 +200,7 @@ if __name__ == "__main__":
                        actionpoint='skylight-send-notification', log=log))
 
     notif_daemon = NotificationDaemon("skylight-notification-daemon",
-                                        "skylight-events")
+                                        "notification-stream")
     daemons.append(notif_daemon)
 
     log.info('--- Daemon Skylight Netsim STARTED ---')
