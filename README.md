@@ -1,5 +1,8 @@
-Reaching Network Automation Level 5: Principles and Practice
-============================================================
+# Reaching Network Automation Level 5: Principles and Practice
+
+[![Run in Cisco Cloud IDE](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-runable-icon.svg)](https://developer.cisco.com/devenv/?id=devenv-base-vscode-nso-local&GITHUB_SOURCE_REPO=https://github.com/NSO-developer/nso-automation-levels-example)
+
+## Introduction
 
 Once the Adaptive Service Activation Scripts (Network Automation
 Level 2) are left behind, a world of life-cycle flexibility and
@@ -30,8 +33,7 @@ Key takeaways:
   environment
 
 
-DISCLAIMER
-----------
+## DISCLAIMER
 This training document is to familiarize with Network Services
 Orchestrator (NSO) and Network Automation Levels. Although the lab
 design and configuration examples could be used as a reference, it’s not
@@ -40,11 +42,10 @@ optimally. For the design related questions please contact your
 representative at Cisco, or a Cisco partner.
 
 
-THE SCENARIO
-------------
+## THE SCENARIO
 
-Background
-----------
+### Background
+
 As an industry, we have been talking for years about "network
 automation". The exact meaning of that concept has often been rather
 nebulous. Attempts at defining more specific levels, similarly to how
@@ -70,8 +71,8 @@ You can read more about the network automation levels in this blog post
     https://community.cisco.com/t5/nso-developer-hub-blogs/network-automation-levels/ba-p/4742665
 
 
-Video Delivery Service
-----------------------
+### Video Delivery Service
+
 In this example, we are looking at a video delivery service. The service
 is implemented by a network of data centers (DCs) and edge devices. Each
 DC contains an Origin Video Server (this is something we made up for
@@ -116,8 +117,8 @@ availability and which Edge device should connect to which DC obviously
 is not automated to a high level. We call this level 3.
 
 
-Lab Starting-point
-------------------
+### Lab Starting-point
+
 In the lab setup, we have a single NSO instance that controls all the
 DCs, all the relevant devices in them, and all the Edge devices. All the
 devices in the DC and the Edge devices are really NSO NETSIM devices.
