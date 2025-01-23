@@ -20,7 +20,7 @@
 
             <!-- Endpoint located in datacenter -->
             <service-endpoints>
-              <endpoint-id>{$DC}-agent</endpoint-id>
+              <endpoint-id>{$DC}</endpoint-id>
               <session-protocol>
                 <twamp-light xmlns="http://accedian.com/ns/yang/session/twamp/light">
                   <session-sender>
@@ -33,7 +33,7 @@
 
             <!-- Endpoint located at edge -->
             <service-endpoints>
-              <endpoint-id>{$EDGE}-twamp</endpoint-id>
+              <endpoint-id>{$EDGE}</endpoint-id>
               <session-protocol>
                 <twamp-light xmlns="http://accedian.com/ns/yang/session/twamp/light">
                   <session-reflector>
