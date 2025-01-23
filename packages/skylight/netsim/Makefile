@@ -7,12 +7,13 @@ XML = $(wildcard *.xml)
 XML += $(NCS_DIR)/netsim/confd/var/confd/cdb/aaa_init.xml
 
 EXTRA_FILES = confd.conf.netsim endpoints.xml daemon.py Accedian_alert_ns.py \
-	      Accedian_alert_type_ns.py Accedian_alert_metric_ns.py
+	      Accedian_alert_type_ns.py Accedian_alert_metric_ns.py \
+		  skylight_netsim_ns.py
 
 YANG = $(wildcard ../src/yang/*.yang)
 SUBMODULES          = $(shell grep -l belongs-to ../src/yang/*.yang \
                         | xargs grep -l submodule)
-ANNOTATION_MODULES  = $(wildcard ../src/yang/*-ann.yang)
+ANNOTATION_MODULES  = $(wildcard *-ann.yang)
 YANG_MODULES = $(filter-out $(SUBMODULES) $(ANNOTATION_MODULES),$(YANG))
 
 BUILTIN_FXS = $(subst $(NCS_DIR)/netsim/confd/etc/confd/,, \
@@ -25,7 +26,7 @@ FXS = $(filter-out $(BUILTIN_FXS), \
 FLAGS = --yangpath ../src/yang
 
 all: $(FXS) vvsim.beam Accedian_alert_ns.py Accedian_alert_type_ns.py \
-	 Accedian_alert_metric_ns.py
+	 Accedian_alert_metric_ns.py skylight_netsim_ns.py
 
 Accedian_alert_ns.py: Accedian-alert.fxs
 	$(CONFDC) --emit-python $@ $<
@@ -34,6 +35,9 @@ Accedian_alert_type_ns.py: Accedian-alert-type.fxs
 	$(CONFDC) --emit-python $@ $<
 
 Accedian_alert_metric_ns.py: Accedian-alert-metric.fxs
+	$(CONFDC) --emit-python $@ $<
+
+skylight_netsim_ns.py: skylight-netsim.fxs
 	$(CONFDC) --emit-python $@ $<
 
 %.fxs:  ../src/yang/%.yang

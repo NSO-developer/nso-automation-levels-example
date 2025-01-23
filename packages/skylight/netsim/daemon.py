@@ -25,6 +25,7 @@ from ncs.log import Log
 from Accedian_alert_ns import ns
 from Accedian_alert_type_ns import ns as ns_type
 from Accedian_alert_metric_ns import ns as ns_metric
+from skylight_netsim_ns import ns as ns_sn
 
 xmltag = _ncs.XmlTag
 value = _ncs.Value
@@ -64,7 +65,7 @@ class NotificationDaemon:
     def join(self):
         self.ndaemon.join()
 
-    def send(self, device, jitter, high=False):
+    def send_alert(self, device, jitter, high=False):
         state = ns_type.acdalt_raised if high else ns_type.acdalt_cleared
 
         values = [
@@ -158,6 +159,30 @@ class NotificationDaemon:
         _ncs.dp.notification_send(self.nctx, get_date_time(), values)
 
 
+    def send_jitter(self, device, jitter):
+        values = [
+            tagvalue(xmltag(ns_sn.hash,
+                            ns_sn.skylight_netsim_jitter_event),
+                     value((ns_sn.skylight_netsim_jitter_event, ns_sn.hash),
+                           _ncs.C_XMLBEGIN)
+                     ),
+            tagvalue(xmltag(ns_sn.hash,
+                            ns_sn.skylight_netsim_device),
+                     value(device, _ncs.C_BUF)),
+
+            tagvalue(xmltag(ns_sn.hash,
+                            ns_sn.skylight_netsim_jitter),
+                     value((jitter, 3), _ncs.C_DECIMAL64)),
+
+            tagvalue(xmltag(ns_sn.hash,
+                            ns_sn.skylight_netsim_jitter_event),
+                     value((ns_sn.skylight_netsim_jitter_event, ns_sn.hash),
+                           _ncs.C_XMLEND)
+                     )
+        ]
+        _ncs.dp.notification_send(self.nctx, get_date_time(), values)
+
+
 class SendNotificationAction(Action):
     @Action.rpc
     def cb_action(self, uinfo, name, input, output):
@@ -167,12 +192,15 @@ class SendNotificationAction(Action):
         if name == "send-notification-high-jitter":
             jitter = jitter or random.randint(5000, 8000)
             high = True
-        else:
+        else: # send-notification-low-jitter
             jitter = jitter or random.randint(1000, 3000)
             high = False
 
         if notif_daemon is not None:
-            notif_daemon.send(input.device, jitter, high)
+            if input.type in (ns_sn.skylight_netsim_enum_jitter, ns_sn.skylight_netsim_enum_jitter_alert):
+                notif_daemon.send_jitter(input.device, jitter)
+            if input.type in (ns_sn.skylight_netsim_enum_alert, ns_sn.skylight_netsim_enum_jitter_alert):
+                notif_daemon.send_alert(input.device, jitter, high)
             self.log.info("Notification sent")
 
 

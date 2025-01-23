@@ -1,33 +1,33 @@
 <config xmlns="http://tail-f.com/ns/config/1.0">
   <service-endpoints xmlns="http://accedian.com/ns/yang/service/endpoint">
     <service-endpoint>
-      <endpoint-id>dc0-agent</endpoint-id>
+      <endpoint-id>dc0</endpoint-id>
       <endpoint-name>dc0-agent</endpoint-name>
       <description>Datacenter 0</description>
       <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:ne-endpoint</type>
       <config>
         <ne-config xmlns="http://accedian.com/ns/yang/service/endpoint/ne">
-          <ne-id>dc0-agent</ne-id>
+          <ne-id>dc0</ne-id>
           <vlan-id>1</vlan-id>
           <ip>10.58.244.99</ip>
         </ne-config>
       </config>
     </service-endpoint>
     <service-endpoint>
-      <endpoint-id>dc1-agent</endpoint-id>
+      <endpoint-id>dc1</endpoint-id>
       <endpoint-name>dc1-agent</endpoint-name>
       <description>Datacenter 1</description>
       <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:ne-endpoint</type>
       <config>
         <ne-config xmlns="http://accedian.com/ns/yang/service/endpoint/ne">
-          <ne-id>dc1-agent</ne-id>
+          <ne-id>dc1</ne-id>
           <vlan-id>1</vlan-id>
           <ip>10.58.244.99</ip>
         </ne-config>
       </config>
     </service-endpoint>
     <service-endpoint>
-      <endpoint-id>edge0-twamp</endpoint-id>
+      <endpoint-id>edge0</endpoint-id>
       <endpoint-name>edge0-twamp</endpoint-name>
       <description>Edge 0</description>
       <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:unmanaged-endpoint</type>
@@ -35,7 +35,7 @@
       </config>
     </service-endpoint>
     <service-endpoint>
-      <endpoint-id>edge1-twamp</endpoint-id>
+      <endpoint-id>edge1</endpoint-id>
       <endpoint-name>edge1-twamp</endpoint-name>
       <description>Edge 1</description>
       <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:unmanaged-endpoint</type>
@@ -43,7 +43,7 @@
       </config>
     </service-endpoint>
     <service-endpoint>
-      <endpoint-id>edge2-twamp</endpoint-id>
+      <endpoint-id>edge2</endpoint-id>
       <endpoint-name>edge2-twamp</endpoint-name>
       <description>Edge 2</description>
       <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:unmanaged-endpoint</type>
@@ -51,7 +51,7 @@
       </config>
     </service-endpoint>
     <service-endpoint>
-      <endpoint-id>edge3-twamp</endpoint-id>
+      <endpoint-id>edge3</endpoint-id>
       <endpoint-name>edge3-twamp</endpoint-name>
       <description>Edge 3</description>
       <type xmlns:acdsept="http://accedian.com/ns/yang/service/endpoint/type">acdsept:unmanaged-endpoint</type>
