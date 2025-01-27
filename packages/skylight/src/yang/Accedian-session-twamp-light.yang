@@ -1,0 +1,271 @@
+module Accedian-session-twamp-light {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/session/twamp/light";
+  prefix acdstwl;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import Accedian-net-type {
+    prefix acdnt;
+  }
+
+  import Accedian-session {
+    prefix acdses;
+  }
+
+  import Accedian-session-type {
+    prefix acdstype;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the definition of an Accedian TWAMP Light
+    session protocol.
+
+    Accedian TWAMP Light defines a simpler version of the RFC5357
+    TWAMP protocol. It differs mainly by eliminating the need for
+    the TWAMP-Control protocol. Some other notable differences are:
+    - Since the control protocol is ommited, the configuration of
+    both the session-sender and session-reflector is done through a
+    static configuration.
+    - The Session-Reflector does not have knowledge of the session
+    state. Because of this, the Session-Reflector will copy the
+    Sequence Number of the received packet to the Sequence Number field
+    of the reflected packet.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2024-08-31 {
+    description
+      "Remove incorrect default value for session-sender/reflector-udp_port.
+      Add a better description to session-sender/reflector-udp_port and
+      session-reflector/reflector-udp_port";
+  }
+    
+  revision 2023-11-24 {
+    description
+      "Remove yang-feature session-sender and yang-feature session-reflector.
+      TWAMP capabilities are now exposed per endpoint in the
+      Accedian-service-endpoint model.
+
+      Fix twamp-light typo in the type of the augment condition";
+  }
+
+  revision 2023-02-10 {
+    description
+      "Initial revision";
+  }
+
+  typedef reflector-mode {
+    description
+      "The modes of operation of the TWAMP Light reflector";
+    type enumeration {
+      enum "stateless" {
+        description
+          "In stateless mode, the reflector does not have a sequence numbers so only
+          round-trip packet domain metrics are reported";
+      }
+      enum "stateful" {
+        description
+          "In stateful mode, the reflector provides a separate series of sequence numbers for
+          the return packets. Metrics (for packet loss, reorder and duplication) are
+          reported separately for the uplink and downlink directions";
+      }
+    }
+  }
+
+  augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:twamp-light')";
+    description
+      "Augment the service session protocol of Accedian-service-session with twamp light
+      config data";
+
+    container twamp-light {
+
+      container session-sender {
+        description
+          "Configuration of the TWAMP Session-Sender logical entity";
+
+        leaf admin-state {
+          type boolean;
+          default false;
+          description
+            "Indicates whether the device is allowed to operate
+            as a TWAMP session-sender";
+        }
+
+        leaf sender-ip {
+          type inet:ip-address;
+          description
+            "The IP address of the Session-Sender device.
+            If not specified, the packets will be sent using
+            the sender local network configuration";
+        }
+
+        leaf sender-udp-port {
+          type acdnt:source-port-number;
+          description
+            "The UDP port number that is to be used by
+            the Session-Sender for this TWAMP-Test session";
+        }
+
+        leaf reflector-ip {
+          type inet:ip-address;
+          description
+            "The IP address belonging to the remote
+            Session-Reflector device to which the TWAMP-Test
+            session will be initiated.
+            If not specified, the address configured in the peered
+            service-session-endpoint will be used.
+            If a peered endpoint is not defined or if the peer doesn't
+            specify an address, an error will be returned";
+        }
+
+        leaf reflector-udp-port {
+          type inet:port-number;
+          description
+            "This parameter defines the UDP port number used by the
+            Session-Sender as the UDP destination port for this TWAMP-Test session. It is
+            used in scenarios where the transmitted destination port must be different from
+            the port value expected by the session-receiver. This is typically required
+            on network paths where the destination port is translated to a different value. For
+            example, with NAT and/or port forwarding.
+
+            If a value for this field is not provided, the value configured
+            in session-reflector/reflector-udp-port will be used";
+        }
+
+        leaf report-interval {
+          type uint16 {
+            range "1..900";
+          }
+          default 30;
+          description
+            "Reporting interval in seconds";
+        }
+
+        leaf reflector-latency-subtraction {
+          type boolean;
+          default true;
+          description
+            "Considering T1 as the sender TX timestamp, T4 as the sender
+            RX timestamps, T2 as the reflector RX timestamp and T3 as
+            the reflector TX timestamps:
+            False indicates that the round trip delay measurement is
+            calculated with T4-T1.
+            True indicates that the round trip delay measurement is
+            calculated by substracting the processing time inside the
+            session-reflector with (T4-T1) - (T3-T2)";
+        }
+
+        container test-packets {
+
+          leaf number-of-packets {
+            type union {
+              type uint32 {
+                range "10..250000";
+              }
+              type enumeration {
+                enum continuous {
+                  description
+                    "The overall number of TWAMP-Test (UDP) packets to be
+                    transmitted by the Session-Sender for this test
+                    session.";
+                }
+              }
+            }
+            default continuous;
+            description
+              "This value determines the number of packets to transmit during the
+              test session.
+              Continuous indicates that the packet will be transmitted *forever*";
+          }
+
+          leaf payload-size {
+            type uint32 {
+              range "41..1472";
+            }
+            default 82;
+            description
+              "Test packets payload size in bytes";
+          }
+
+          leaf rate {
+            type uint16 {
+              range "1..1000";
+            }
+            default 10;
+            description
+              "Test packets transmit rate in PPS";
+          }
+
+          leaf dscp {
+            type acdnt:dscp;
+            description
+              "The DSCP value present in the IP header of the
+              TWAMP-Test (UDP) packets";
+          }
+
+          leaf ttl {
+            type acdnt:ttl;
+            description
+              "The Time To Live value present in the IP header of
+              the TWAMP-Test (UDP) packets";
+          }
+
+          leaf vlan-priority {
+            type acdnt:vlan-prio;
+            description
+              "Vlan priority. Used when the test packet is sent
+              with a vlan tag";
+          }
+        }
+      }
+
+      container session-reflector {
+        description
+          "Configuration of the TWAMP Session-Reflector logical entity";
+
+        leaf admin-state {
+          type boolean;
+          default false;
+          description
+            "Indicates whether the device is allowed to operate
+            as a TWAMP session-reflector";
+        }
+
+        leaf reflector-udp-port {
+          type inet:port-number;
+          default 862;
+          description
+            "The destination UDP port number expected by the session-reflector
+            for the test packets belonging to this test session.";
+        }
+
+        leaf mode {
+          type reflector-mode;
+          default stateful;
+          description
+            "The mode of operation of the reflector. Modes are described in the
+            reflector-mode type";
+        }
+      }
+    }
+  }
+}
+

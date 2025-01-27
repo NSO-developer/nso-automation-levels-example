@@ -25,6 +25,7 @@ from streaming.skylight_notification_action import SkylightNotificationAction
 from streaming.keep_optimizing_action import StreamerOptimizeAction
 from streaming.vary_energy_price_action import StreamerVaryEnergyPriceAction
 
+
 class DCInit(NanoService):
     @NanoService.create
     def cb_nano_create(self, tctx, root, service, plan, component, state, proplist, compproplist):
@@ -33,21 +34,26 @@ class DCInit(NanoService):
         # Find the DC with the lowest jitter
         best_jitter = 100000
         best_dc = None
+
         for dc in root.dc:
             if dc.oper_status.jitter is None:
                 self.log.info(f'Checking DC {dc.name}: DC is not ready')
                 continue # Data not available yet, disregard this option
+
             dc_jitter = float(dc.oper_status.jitter)
             self.log.info(f'Checking DC {dc.name}: jitter {dc_jitter}')
+
             if dc_jitter < best_jitter:
                 best_jitter = dc_jitter
                 best_dc = dc
+
         if best_dc is None:
             raise Exception('No DC found')
+
         self.log.info(f'Found DC {best_dc} with the lowest jitter {best_jitter}')
-        
         service.oper_status.chosen_dc = best_dc.name    # Value goes into operational data, usable
                                                         # by templates applied at later stages
+
 
 class ConnectedToSkylight(NanoService):
     @NanoService.create
@@ -55,9 +61,6 @@ class ConnectedToSkylight(NanoService):
         self.log.info(f'cb_nano_create: ConnectedToSkylight for {service.name}')
         vars = ncs.template.Variables()
 
-        # Create a unique session ID from the service name
-        vars.add('SESSION_ID', str(uuid.uuid5(uuid.NAMESPACE_DNS,
-                 f'{service.name}-edge-connected-to-skylight')))
         # Apply the template
         template = ncs.template.Template(service)
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)

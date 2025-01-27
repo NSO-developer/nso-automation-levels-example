@@ -1,0 +1,231 @@
+module Accedian-service {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/service";
+  prefix acdserv;
+
+  import Accedian-type {
+    prefix acdt;
+  }
+
+  import Accedian-session-type {
+    prefix acdst;
+  }
+
+  import Accedian-session {
+    prefix acdses;
+  }
+
+  import Accedian-service-endpoint-type {
+    prefix acdsept;
+  }
+
+  import Accedian-service-type {
+    prefix acdservt;
+  }
+
+  import Accedian-extensions {
+    prefix acdext;
+  }
+
+  import Accedian-metadata {
+    prefix acdmeta;
+  }
+
+  import Accedian-alert {
+    prefix acda;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the definition of a service.
+    Service specific data is added through service type modules. Their
+    implementation is contained in modules following the
+    format: Accedian-service-<type>.yang. They augment
+    the service model when services:type match
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2024-08-31 {
+    description
+      "Add metadata container. Remove delete service rpc. It was
+      never implemented";
+  }
+
+  revision 2023-06-23 {
+    description
+      "Add the service group-id field";
+  }
+
+  revision 2023-02-10 {
+    description
+      "Initial revision ";
+  }
+
+  notification state-change-event {
+    description
+      "A top level notification providing state change information on the service and it's
+      associated service sessions and service endpoints";
+
+    leaf service-id {
+      type acdt:id;
+      description
+        "The service affected by this state change event. It correspond to
+        the service-id of one of the services configured";
+
+    }
+
+    leaf group-id {
+      type acdt:id;
+      description
+        "The value of the Group ID configured in Accedian-service:services:service:group-id.
+        The value will be present only if the value was configured in the service associated
+        with state-change-event:service-id";
+    }
+
+    list session-state-change {
+      description
+        "Each node in this list corresponds to a state change of a service session status. This
+        service session is associated with it's parent service. This notification could be
+        generate from a state change from the service session itself or from one of its associated
+        service-endpoints";
+      key session-id;
+
+      leaf session-id {
+        description
+          "The session identifier. This leaf corresponds to one of the session
+          identifier configured in the session list under this service-id.";
+        type acdt:id;
+      }
+      uses acdst:service-session-state-data;
+
+      list service-endpoint-state-change {
+        description
+          "Each node in this list corresponds to a state change of a service endpoint status. This
+          service endpoint is associated with it's parent service and session";
+        key endpoint-id;
+
+        leaf endpoint-id {
+          description
+            "Correspond to the identifier of the service endpoint configured under
+            this service service-id/session-id";
+          type acdt:id;
+        }
+        uses acdsept:service-endpoint-state-data;
+      }
+    }
+  }
+
+  container services {
+    list service {
+      description
+        "List of all the services configured";
+      key service-id;
+      unique service-name;
+
+      leaf service-id {
+        type acdt:id;
+        acdext:tag-metadata service_id;
+        description
+          "Id uniquely identifying the service.
+          tag-metadata: This leaf will be included as part of the analytics
+          metadata as { service_id : <service-id> }";
+      }
+
+      leaf service-name {
+        type acdt:id;
+        acdext:tag-metadata service_name;
+        description
+          "An optional human readable service name. When provided, the field must
+          be unique through all the 'list service' instances.
+          'service-name' can be used as an extra metadata query parameter in
+          analytics in addition to the service-id. It can also be configured
+          to query more easily the analytics when the service-id is in non-human
+          readble form (numerical, UUIDs, etc...).
+          tag-metadata: This leaf will be included as part of the analytics
+          metadata as { service_name : <service-name> }";
+      }
+
+      leaf group-id {
+        type acdt:id;
+        description
+          "An optional group identifier that associates this service to a logical group of
+          services. The yang client can associate a service to a group of services by configuring
+          the same group-id in all the services belonging to that group. These groupings can then
+          be used to perform operations on all services belonging to a group. It can also be used
+          to register to event stream resources based on the group-id";
+      }
+
+      leaf description {
+        type string;
+        description
+          "An optional human readable description for this service";
+      }
+
+      leaf type {
+        type identityref {
+          base acdservt:service;
+        }
+        description
+          "The service deployment type";
+        reference
+          "Supported types are specified in Accedian-service-type.yang";
+      }
+
+      container service-definition {
+        description
+          "Service definition mount point. Service specific data is mounted here through
+          Yang augment ation";
+      }
+
+      list sessions {
+        description
+          "The list of sessions involved in this service";
+        key session-id;
+
+        leaf session-id {
+          description
+            "A reference pointing to a pre-existing session. The session is involved in this
+            service";
+          type leafref {
+            path "/acdses:sessions/acdses:session/acdses:session-id";
+          }
+        }
+      }
+
+      container metadata {
+        description
+          "A list of metadata key-value that will be configured on all the sessions included in this service";
+        uses acdmeta:metadata-list;
+      }
+
+      list alerts {
+        key alert-policy-id;
+        description
+          "A list of alert policies used to monitor this service. If one of
+          the alert policy condition is met for a session configured under
+          this service, an alert notification will be generated";
+        leaf alert-policy-id {
+          description
+            "Alerts are configured by referring to existing alert policies";
+          type leafref {
+            path "/acda:alert-policies/acda:alert-policy/acda:policy-id";
+          }
+        }
+      }
+    }
+  }
+}

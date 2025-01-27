@@ -86,7 +86,7 @@ print(Fmt, Args) ->
 
 print_start(From) ->
     register(printer, self()),
-    {ok, Fd} = file:open("./vvsim.log", [write]),
+    {ok, Fd} = file:open("./logs/vvsim.log", [write]),
     From ! print_started,
     print_loop(Fd).
 

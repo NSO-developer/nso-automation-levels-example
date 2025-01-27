@@ -1,0 +1,111 @@
+module Accedian-service-endpoint-ne {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/service/endpoint/ne";
+  prefix acdsepne;
+
+  import Accedian-type {
+    prefix acdt;
+  }
+
+  import Accedian-service-endpoint-type {
+    prefix acdsept;
+  }
+
+  import Accedian-service-endpoint {
+    prefix acdsep;
+  }
+
+  import Accedian-extensions {
+    prefix acdext;
+  }
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the definition of a Accedian NE endpoint.
+    It augments the definition of the top level Accedian endpoint.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2024-08-31 {
+    description
+      "Update VlanID description. By customer request, vlan-id
+      is now optional";
+  }
+
+  revision 2023-06-23 {
+    description
+      "Add a new sub-interface field";
+  }
+
+  revision 2023-02-10 {
+    description
+      "Initial revision";
+  }
+
+
+  augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:config" {
+    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type, 'acdsept:ne-endpoint')" {
+      description
+        "Augment Accedian service-endpoint data with NE support";
+    }
+
+    container ne-config {
+      description
+        "The configuration elements of a NE type service endpoint. It is characterized by an id
+        representing a network and a vlan used in VRF and/or VPN service";
+
+      leaf ne-id {
+        type acdt:id;
+        acdext:tag-metadata ne_id;
+        description
+          "The NE network endpoint network identifier (ne-id).
+          tag-metadata: This leaf will be included as part of the analytics
+          metadata as { ne-id : <ne-id> }
+
+          -- Implementation note: Even though 'mandatory true' is not explicitly specified
+          here, consider this field as mandatory as if 'mandatory true' was specified. A bug
+          in the current yang parser implementation prevents us from specifying it at the yang
+          level. The implementation will still return an error if this field is not specified.
+          This will be fixed in the next release";
+      }
+
+      leaf vlan-id {
+        type uint16;
+        description
+          "The vlan to use to access the network as part of the endpoint identifier";
+      }
+
+      leaf ip {
+        type inet:ip-address;
+        description
+          "The service endpoint IP address";
+      }
+
+      leaf sub-interface {
+        type string;
+        description
+          "An optional interface definition that allow to refine the identification/location of the endpoint. For
+          example, it can be used (but is not limited) to specify a specific physical/logical port or a
+          specific network namespace";
+      }
+    }
+  }
+}

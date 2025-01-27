@@ -4,13 +4,13 @@
     <fw>fw0</fw>
     <media-origin>origin0</media-origin>
     <skylight>skylight</skylight>
-    <skylight-agent-id>a31e3e45-ec69-4f4a-a479-b2273f8077be</skylight-agent-id>
+    <skylight-endpoint-id>dc0</skylight-endpoint-id>
   </dc>
   <dc xmlns="http://com/example/basic-streaming/streaming">
     <name>dc1</name>
     <fw>fw1</fw>
     <media-origin>origin1</media-origin>
     <skylight>skylight</skylight>
-    <skylight-agent-id>f0bc9b37-5f7f-4006-9487-8cbcc313132d</skylight-agent-id>
+    <skylight-endpoint-id>dc1</skylight-endpoint-id>
   </dc>
 </config>

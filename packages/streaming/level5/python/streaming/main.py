@@ -25,6 +25,7 @@ from streaming.skylight_notification_action import SkylightNotificationAction
 from streaming.keep_optimizing_action import StreamerOptimizeAction
 from streaming.vary_energy_price_action import StreamerVaryEnergyPriceAction
 
+
 class DCInit(NanoService):
     JITTER_WEIGHT = 1
     PRICE_WEIGHT = 2
@@ -36,34 +37,43 @@ class DCInit(NanoService):
         # Find the DC with the lowest score (based on jitter, energy-price and DC capacity)
         best_score = 100000
         best_dc = None
+
         for dc in root.dc:
             if dc.oper_status.jitter is None or dc.oper_status.energy_price is None:
                 self.log.info(f'Checking DC {dc.name}: DC is not ready')
                 continue # Data not available yet, disregard this option
-            if len(dc.oper_status.edge_clients) >= dc.edge_capacity and service.name not in dc.oper_status.edge_clients:
+
+            if (len(dc.oper_status.edge_clients) >= dc.edge_capacity and
+                service.name not in dc.oper_status.edge_clients):
                 self.log.info(f'Checking DC {dc.name}: DC is full')
                 continue # Already full, not an option
+
             dc_jitter = float(dc.oper_status.jitter)
             dc_price = int(dc.oper_status.energy_price)
-            dc_score = DCInit.JITTER_WEIGHT * math.log10(dc_jitter) + \
-                       DCInit.PRICE_WEIGHT * math.log10(dc_price)
-            self.log.info(f'Checking DC {dc.name}: jitter {dc_jitter} price {dc_price} -> score {dc_score}')
+            dc_score = (DCInit.JITTER_WEIGHT * math.log10(dc_jitter) +
+                       DCInit.PRICE_WEIGHT * math.log10(dc_price))
+            self.log.info(f'Checking DC {dc.name}: jitter {dc_jitter} price {dc_price} -> '
+                          f'score {dc_score}')
+
             if dc_score < best_score:
                 best_score = dc_score
                 best_dc = dc
+
         if best_dc is None:
             raise Exception('No DC found')
+
         if service.oper_status.chosen_dc:
             self.log.info(f'Leaving DC {root.dc[service.oper_status.chosen_dc].name}')
             # This is just to keep operators informed, not affecting the service logic
             root.dc[service.oper_status.chosen_dc].oper_status.edge_clients.remove(service.name)
 
-        service.oper_status.chosen_dc = best_dc.name    # Value goes into operational data, usable
-                                                        # by templates applied at later stages
-
+        # Value goes into operational data, usable by templates applied at later stages
+        service.oper_status.chosen_dc = best_dc.name
         self.log.info(f'Using DC {root.dc[service.oper_status.chosen_dc].name}')
+
         # This is just to keep operators informed, not affecting the service logic
         root.dc[service.oper_status.chosen_dc].oper_status.edge_clients.create(service.name)
+
 
 class ConnectedToSkylight(NanoService):
     @NanoService.create
@@ -71,9 +81,6 @@ class ConnectedToSkylight(NanoService):
         self.log.info(f'cb_nano_create: ConnectedToSkylight for {service.name}')
         vars = ncs.template.Variables()
 
-        # Create a unique session ID from the service name
-        vars.add('SESSION_ID', str(uuid.uuid5(uuid.NAMESPACE_DNS,
-                 f'{service.name}-edge-connected-to-skylight')))
         # Apply the template
         template = ncs.template.Template(service)
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)

@@ -1,0 +1,90 @@
+module Accedian-service-endpoint-nid {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/service/endpoint/nid";
+  prefix acdsepnid;
+
+  import Accedian-type {
+    prefix acdt;
+  }
+
+  import Accedian-net-type {
+    prefix acdnt;
+  }
+
+  import Accedian-service-endpoint-type {
+    prefix acdsept;
+  }
+
+  import Accedian-service-endpoint {
+    prefix acdsep;
+  }
+
+  import Accedian-extensions {
+    prefix acdext;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the definition of a Accedian NID endpoint.
+    It augments the definition of the top level Accedian endpoint.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-11-24 {
+    description
+      "Initial revision";
+  }
+
+  augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:config" {
+    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type, 'acdsept:nid-endpoint')" {
+      description
+        "Augment Accedian service-endpoint data with NID endpoint support";
+    }
+
+    container nid-config {
+      description
+        "The configuration elements of a NID type service endpoint. It is characterized by logical
+        and physical caracteristics";
+
+      leaf nid-id {
+        type acdt:id;
+        acdext:tag-metadata nid_id;
+        description
+          "The Network Interface Device identifier";
+      }
+
+      leaf sub-id {
+        type acdt:id;
+        acdext:tag-metadata sub_id;
+        description
+          "When applicable, contain the sub-identifier of the device. This is used when a device
+          is accessed via a virtual controller. For example, a Nano SFP device controlled by a
+          VCX:
+          id = <VCX ID>
+          sub-id = <Nano SFP ID>";
+      }
+
+      leaf port {
+        type acdnt:logical-port;
+        description
+          "An optional interface definition that allow to refine the identification/location of the endpoint. For
+          example, it can be used (but is not limited) to specify a specific physical/logical port or a
+          specific network namespace";
+      }
+    }
+  }
+}

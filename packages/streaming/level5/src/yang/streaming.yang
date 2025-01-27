@@ -16,8 +16,11 @@ module streaming {
   import tailf-kicker {
     prefix kicker;
   }
-  import accedian-gateway-orchestrator {
-    prefix accgwo;
+  import Accedian-type {
+    prefix acdt;
+  }
+  import Accedian-service-endpoint {
+    prefix accsep;
   }
   import skylight-nc {
     prefix skylight-nc;
@@ -87,11 +90,11 @@ module streaming {
         error-message "Only the name of a skylight device makes sense here.";
       }
     }
-    leaf skylight-agent-id {
-      type string;
+    leaf skylight-endpoint-id {
+      type acdt:id;
       tailf:non-strict-leafref {
-        path "/ncs:devices/ncs:device/ncs:config/accgwo:accedian-components" +
-             "/accgwo:sensor-agent/accgwo:agents/accgwo:agent/accgwo:agentId";
+        path "/ncs:devices/ncs:device/ncs:config/acdsep:service-endpoints" +
+             "/acdsep:service-endpoint/acdsep:endpoint-id";
       }
     }
     leaf edge-capacity {

@@ -1,0 +1,30 @@
+module skylight-netsim-ann {
+  namespace "http://tail-f.com/pkg/skylight-netsim-ann";
+  prefix skylight-netsim-ann;
+
+  import tailf-common { prefix tailf; }
+  import skylight-netsim { prefix skylight-netsim; }
+  import Accedian-type { prefix acdt; }
+  import Accedian-service-endpoint { prefix acdsep; }
+  import Accedian-service-endpoint-type { prefix acdsept; }
+
+  organization "Cisco Systems";
+  contact "<support@tail-f.com>";
+
+  description
+    "Skylight netsim models annotation.";
+
+  revision 2025-01-22 {
+    description
+      "Inital version.";
+  }
+
+  tailf:annotate-module "skylight-netsim" {
+    tailf:annotate-statement "grouping[name='jitter-grouping']" {
+        tailf:annotate-statement "leaf[name='device']" {
+        must "derived-from-or-self(/acdsep:service-endpoints" +
+            "/acdsep:service-endpoint[acdsep:endpoint-id=current()]/acdsep:type, 'acdsept:unmanaged-endpoint')";   
+        }
+    }
+  }
+}

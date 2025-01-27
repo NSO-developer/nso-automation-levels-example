@@ -3,6 +3,9 @@ module skylight-netsim {
   prefix skylight-netsim;
 
   import tailf-common { prefix tailf; }
+  import Accedian-type { prefix acdt; }
+  import Accedian-service-endpoint { prefix accsep; }
+  import Accedian-service-endpoint-type { prefix acdsept; }
 
   organization "Cisco Systems";
   contact "<support@tail-f.com>";
@@ -26,7 +29,11 @@ module skylight-netsim {
     leaf device {
       description "Name of the device this notification pertains to.";
       mandatory true;
-      type string;
+      type acdt:id;
+      tailf:non-strict-leafref {
+        path "/acdsep:service-endpoints" +
+             "/acdsep:service-endpoint/acdsep:endpoint-id";
+       }   
     }
     leaf jitter {
       description "Optional jitter value. If not specified, 
@@ -35,22 +42,46 @@ module skylight-netsim {
     }
   }
 
-  rpc send-notification-high-jitter {
-    tailf:actionpoint "skylight-send-notification";
-    input {
-      uses jitter-grouping;
-    }
-  }
-  rpc send-notification-low-jitter {
-    tailf:actionpoint "skylight-send-notification";
-    input {
-      uses jitter-grouping;
+  grouping alerts-grouping {
+    leaf type {
+      description "Notifications to send.";
+      type enumeration {
+        enum jitter {
+          description "Send a jitter event.";
+          tailf:code-name "enum_jitter";
+        }
+        enum alert {
+          description "Send an alert event.";
+          tailf:code-name "enum_alert";
+        }
+        enum jitter-alert {
+          description "Send both jitter and alert events.";
+          tailf:code-name "enum_jitter_alert";
+        }
+      }
+      default jitter;
     }
   }
 
-  notification skylight-event {
+  rpc send-notification-high {
+    tailf:actionpoint "skylight-send-notification";
+    input {
+      uses jitter-grouping;
+      uses alerts-grouping;
+    }
+  }
+  rpc send-notification-low {
+    tailf:actionpoint "skylight-send-notification";
+    input {
+      uses jitter-grouping;
+      uses alerts-grouping;
+    }
+  }
+
+
+  notification jitter-event {
     description
-      "Event emitted from the Skylight Netsim device.";
+      "Jitter event emitted from the Skylight Netsim device.";
     leaf device {
       description "Name of the device this notification pertains to.";
       mandatory true;

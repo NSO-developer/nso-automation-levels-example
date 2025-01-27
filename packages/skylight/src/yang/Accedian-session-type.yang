@@ -1,0 +1,141 @@
+module Accedian-session-type {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/session/type";
+  prefix acdst;
+
+  import Accedian-type {
+    prefix acdt;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the type definitions of a Accedian session.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2024-08-31 {
+    description
+      "Add session type: transfer";
+  }
+
+  revision 2023-02-10 {
+    description
+      "Initial revision";
+  }
+
+  identity session {
+    description
+      "The base type identifying a Accedian session";
+  }
+
+
+  identity twamp-light {
+    base session;
+    description
+      "The type representing a Accedian TWAMP Light session. TWAMP Light
+      is a simplified TWAMP without the client-control and server";
+  }
+
+  identity throughput {
+    base session;
+    description
+      "The type representing a Accedian Throughput session";
+  }
+
+  identity pathtrace {
+    base session;
+    description
+      "The type representing a Accedian Pathtrace session";
+  }
+
+  identity transfer {
+    base session;
+    description
+      "The type representing a Accedian Transfer session";
+  }
+
+  identity sat {
+    base session;
+    description
+      "The base type representing a Accedian site acceptance test session";
+  }
+
+  identity rfc2544 {
+    base sat;
+    description
+      "The type representing a Accedian RFC2544 session";
+  }
+
+  identity y1564 {
+    base sat;
+    description
+      "The type representing a Accedian Y1564 session";
+  }
+
+  typedef capability-value {
+    description
+      "The value associated with each capability key. The value depends on the key. The value type
+      is provided in the key description in each session type capability files";
+    type union {
+      type int32;
+      type boolean;
+      type string;
+    }
+  }
+
+
+  typedef service-session-status {
+    description
+      "Defines the different status that can apply to a service endpoint";
+
+    type enumeration {
+      enum "running" {
+        description
+          "The session is started and running.";
+      }
+
+      enum "stopped" {
+        description
+          "The session is stopped and not running. A rpc start is required to start the session";
+      }
+
+      enum "error" {
+        description
+          "The session is currently in error state. It currently cannot be started";
+      }
+    }
+  }
+
+  grouping service-session-state-data {
+    description
+      "The data representing the current state of the session";
+
+    leaf status {
+      type service-session-status;
+      description
+        "The current status of the session. Each state is described in the type definition";
+    }
+
+    uses acdt:error-data {
+      description
+        "The error structure describing the error.
+
+        NOTE:
+        *** Present when service-session-status is set to error. Not present otherwise ***";
+    }
+  }
+}
