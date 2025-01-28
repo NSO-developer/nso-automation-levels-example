@@ -55,10 +55,10 @@ module streaming {
 // DC LIST //////////////////////////////////////////////////////////////////////
 
   list dc {
-    description 
+    description
       "List of available datacenters, and pointers to the devices part of it";
 
-    key name;  
+    key name;
     leaf name {
       type string;
     }
@@ -67,7 +67,7 @@ module streaming {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
-      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id, 
+      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id,
             'firewall-nc:firewall-nc')" {
         error-message "Only the name of a firewall device makes sense here.";
       }
@@ -76,7 +76,7 @@ module streaming {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
-      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id, 
+      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id,
             'origin-nc:origin-nc')" {
         error-message "Only the name of an origin video server device makes sense here.";
       }
@@ -85,7 +85,7 @@ module streaming {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
-      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id, 
+      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id,
             'skylight-nc:skylight-nc')" {
         error-message "Only the name of a skylight device makes sense here.";
       }
@@ -143,7 +143,7 @@ module streaming {
       type leafref {
         path "/ncs:devices/ncs:device/ncs:name";
       }
-      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id, 
+      must "derived-from(/ncs:devices/ncs:device[ncs:name=current()]/ncs:device-type/ncs:netconf/ncs:ned-id,
             'edge-nc:edge-nc')" {
         error-message "Only the name of an edge device makes sense here.";
       }
@@ -182,8 +182,8 @@ module streaming {
     action optimize {
       tailf:actionpoint optimize;
       output {
-        leaf result { 
-          type string; 
+        leaf result {
+          type string;
         }
       }
     }
@@ -196,8 +196,8 @@ module streaming {
         }
       }
       output {
-        leaf result { 
-          type string; 
+        leaf result {
+          type string;
         }
       }
     }

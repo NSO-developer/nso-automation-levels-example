@@ -22,7 +22,7 @@ class StreamerOptimizeAction(ncs.dp.Action):
     # actions optimize
     # Toggles automatic optimization (=re-deploy) of edge services.
     # cb_action is called by NSO when the action is invoked. This starts a background
-    # thread that keeps redeploying edge service instances at regular intervals. 
+    # thread that keeps redeploying edge service instances at regular intervals.
     # If the thread is already running, it will instead be requested to stop.
     @Action.action
     def cb_action(self, uinfo, name, kp, input, output, trans):
@@ -43,7 +43,7 @@ class StreamerOptimizeAction(ncs.dp.Action):
             self.log.info(output.result)
 
     # worker_thread
-    # (<Optimizes>) edge service instances, one at a time. 
+    # (<Optimizes>) edge service instances, one at a time.
     # The thread runs every few seconds (INTERVAL_TIME) until requested to stop.
     def worker_thread(self):
         try:

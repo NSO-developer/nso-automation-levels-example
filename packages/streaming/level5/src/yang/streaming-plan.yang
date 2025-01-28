@@ -35,11 +35,11 @@ submodule streaming-plan {
     base ncs:plan-component-type;
   }
   identity skylight-configured {
-    base ncs:plan-state;  
+    base ncs:plan-state;
     description "Add DC to Skylight";
   }
   identity fw-configured {
-    base ncs:plan-state;  
+    base ncs:plan-state;
     description "Allow traffic between media origin and edge";
   }
 
@@ -47,7 +47,7 @@ submodule streaming-plan {
     base ncs:plan-component-type;
   }
   identity connected-to-skylight {
-    base ncs:plan-state;  
+    base ncs:plan-state;
     description "Add edge to Skylight";
   }
   identity connected-to-dc {
@@ -82,7 +82,7 @@ submodule streaming-plan {
           ncs:nano-callback;
         }
       }
-      ncs:state "ncs:ready";      
+      ncs:state "ncs:ready";
     }
 
     ncs:component-type "edge" {
@@ -101,7 +101,7 @@ submodule streaming-plan {
           ncs:nano-callback;
         }
       }
-      ncs:state "ncs:ready";      
+      ncs:state "ncs:ready";
     }
   }
 

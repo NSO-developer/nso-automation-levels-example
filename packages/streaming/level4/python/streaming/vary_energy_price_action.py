@@ -23,7 +23,7 @@ class StreamerVaryEnergyPriceAction(ncs.dp.Action):
     # actions vary-energy-price
     # Toggles automatic variation of the operational energy-price leaf in the DC list.
     # cb_action is called by NSO when the action is invoked. This starts a background
-    # thread that keeps setting the energy price. If the thread is already running, 
+    # thread that keeps setting the energy price. If the thread is already running,
     # it will instead be requested to stop.
     @Action.action
     def cb_action(self, uinfo, name, kp, input, output, trans):
@@ -39,7 +39,7 @@ class StreamerVaryEnergyPriceAction(ncs.dp.Action):
                 output.result = "Stopped Varying Energy Price"
                 self.log.info(output.result)
             else:
-                thread = threading.Thread(target=StreamerVaryEnergyPriceAction.worker_thread, 
+                thread = threading.Thread(target=StreamerVaryEnergyPriceAction.worker_thread,
                                           args=(self,), daemon=True)
                 StreamerVaryEnergyPriceAction.energy_price_thread = thread
                 StreamerVaryEnergyPriceAction.energy_price_thread.start()
@@ -55,7 +55,7 @@ class StreamerVaryEnergyPriceAction(ncs.dp.Action):
     # number of steps is assigned for each DC. In each iteration, the current price moves one
     # step closer to the target price value. When the target price is reached, the target is
     # deleted from the target dictionary, and a new target and number of steps will be assigned
-    # in the next iteration. The thread runs every few seconds (INTERVAL_TIME) until requested 
+    # in the next iteration. The thread runs every few seconds (INTERVAL_TIME) until requested
     # to stop.
     def worker_thread(self):
         try:
@@ -80,9 +80,9 @@ class StreamerVaryEnergyPriceAction(ncs.dp.Action):
                     # Take the first DC in the list, and remove it from the work item list
                     dc = r.streaming__dc[dc_names.pop(0)]
                     if dc.name not in price_targets:
-                        price_targets[dc.name] = { 
-                            'steps': random.choice([1,3,4,5,8]), 
-                            'value': max(1,int(random.normalvariate(mu=100, sigma=40))) 
+                        price_targets[dc.name] = {
+                            'steps': random.choice([1,3,4,5,8]),
+                            'value': max(1,int(random.normalvariate(mu=100, sigma=40)))
                         }
                     curr_price = int(dc.oper_status.energy_price) or 100
                     curr_steps = price_targets[dc.name].get('steps',1)
