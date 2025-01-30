@@ -2,7 +2,7 @@
   <?set EDGE = {./name}?>
   <?set DC = {./oper-status/chosen-dc}?>
   <?set SESSION_ID = {./name}-connected-to-skylight?>
-  <?set SERVICE_NAME = {./name}-connected-to-skylight?>
+  <?set SERVICE_ID = {./name}-connected-to-skylight?>
   <?set-root-node {/}?>
   <devices xmlns="http://tail-f.com/ns/ncs">
     <device>
@@ -17,7 +17,7 @@
 
             <!-- Endpoint located in datacenter -->
             <service-endpoints>
-              <endpoint-id>{$DC}</endpoint-id>
+              <endpoint-id>{/streaming:dc[name=$DC]/skylight-endpoint-id}</endpoint-id>
               <session-protocol>
                 <twamp-light xmlns="http://accedian.com/ns/yang/session/twamp/light">
                   <session-sender>
@@ -86,9 +86,9 @@
         <!-- Service -->
         <services xmlns="http://accedian.com/ns/yang/service">
           <service>
-            <service-id>{$SERVICE_NAME}</service-id>
-            <service-name>{$SERVICE_NAME}</service-name>
-            <description>{$SERVICE_NAME}</description>
+            <service-id>{$SERVICE_ID}</service-id>
+            <service-name>{$SERVICE_ID}</service-name>
+            <description>{$SERVICE_ID}</description>
             <sessions>
               <session-id>{$SESSION_ID}</session-id>
             </sessions>
