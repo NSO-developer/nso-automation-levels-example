@@ -1,7 +1,6 @@
 <config-template xmlns="http://tail-f.com/ns/config/1.0">
   <?set EDGE = {./name}?>
   <?set DC = {./oper-status/chosen-dc}?>
-  <?set SESSION_ID = {./name}-connected-to-skylight?>
   <?set SERVICE_ID = {./name}-connected-to-skylight?>
   <?set-root-node {/}?>
   <devices xmlns="http://tail-f.com/ns/ncs">
