@@ -128,11 +128,11 @@ We have endowed some of these NETSIMs with a little bit of additional
 behavior, though, so that they react and respond to a few things. Such
 functionality will be described later, as needed.
 
-Also, logically part of each DC is an Accedian Skylight monitoring
-system. In our setup, there is really only one instance of a skylight
-system, or “device” as NSO tends to think of all managed systems as
-devices. A single skylight is enough since we think of it as running “in
-the cloud” outside our DCs.
+Also, logically part of each DC is a Provider Connectivity Assurance (PCA)
+monitoring system or Accedian Skylight when referred to as its older name.
+In our setup, there is only one instance of a skylight system, or “device”
+as NSO tends to think of all managed systems as devices. A single skylight
+is enough since we think of it as running “in the cloud” outside our DCs.
 
 When we start, the NSO system is already up and running with the level 3
 service implementation, and there are Network Element Drivers (NEDs) for
