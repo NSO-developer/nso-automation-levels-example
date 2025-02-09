@@ -31,6 +31,10 @@ class ConnectedToSkylight(NanoService):
         self.log.info(f'cb_nano_create: ConnectedToSkylight for {service.name}')
         vars = ncs.template.Variables()
 
+        session_id = uuid.uuid5(uuid.NAMESPACE_DNS,
+                                f'{service.name}-edge-connect-to-skylight')
+        vars.add('SESSION_ID', str(session_id))
+        
         # Apply the template
         template = ncs.template.Template(service)
         template.apply('edge-servicepoint-edge-connected-to-skylight', vars)
